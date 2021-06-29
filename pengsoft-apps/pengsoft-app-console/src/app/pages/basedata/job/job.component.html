@@ -1,0 +1,6 @@
+<app-list #listComponent [title]="(title ? title : '') + '职位列表'" [fields]="fields" [navData]="navData"
+    (nav)="nav($event)" [listData]="listData" [toolbar]="listToolbar" [action]="listAction">
+</app-list>
+<app-edit #editComponent [title]="(title ? title : '') + '职位编辑'" [fields]="fields" [form]="editForm"
+    [toolbar]="editToolbar" [errors]="errors"></app-edit>
+<app-edit-many-to-many #jobRolesComponent title="分配角色" [toolbar]="grantToolbar"></app-edit-many-to-many>

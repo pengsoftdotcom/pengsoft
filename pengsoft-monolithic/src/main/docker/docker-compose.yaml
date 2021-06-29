@@ -1,0 +1,30 @@
+services:
+  adminer:
+    image: ${ADMINER_IMAGE}
+    restart: always
+    ports:
+      - 12001:8080
+  postgresql:
+    image: ${POSTGRESQL_IMAGE}
+    restart: always
+    volumes:
+      - ./postgresql/data:${POSTGRESQL_DATA}
+    environment:
+      PGDATA: ${POSTGRESQL_DATA}
+      POSTGRES_PASSWORD: ${POSTGRESQL_PASSWORD}
+    ports:
+      - 5432:5432
+  redisadmin:
+    image: ${REDIS_ADMIN_IMAGE}
+    restart: always
+    environment:
+      REDIS_1_HOST: redis
+    ports:
+      - 12002:80
+  redis:
+    image: ${REDIS_IMAGE}
+    restart: always
+    volumes:
+      - ./redis/data:/data
+    ports:
+      - 6379:6379

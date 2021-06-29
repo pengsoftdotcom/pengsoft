@@ -1,0 +1,7 @@
+<app-list #listComponent title="附件列表" [fields]="fields" [listData]="listData" [pageData]="pageData"
+    [toolbar]="listToolbar" [action]="listAction" (pageChange)="list()"></app-list>
+<app-edit #editComponent title="附件编辑" [fields]="fields" [form]="editForm" [toolbar]="editToolbar" [errors]="errors">
+</app-edit>
+<ng-template #content>
+    <app-input-upload></app-input-upload>
+</ng-template>

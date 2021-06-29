@@ -1,0 +1,5 @@
+<app-list #listComponent title="权限列表" [fields]="fields" [listData]="listData" [pageData]="pageData"
+    [toolbar]="listToolbar" [action]="listAction" (pageChange)="list()" [footerToolbar]="true">
+</app-list>
+<app-edit #editComponent title="权限编辑" [fields]="fields" [form]="editForm" [toolbar]="editToolbar" [errors]="errors">
+</app-edit>

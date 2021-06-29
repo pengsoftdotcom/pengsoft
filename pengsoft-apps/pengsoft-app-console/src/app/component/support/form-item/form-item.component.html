@@ -1,0 +1,40 @@
+<nz-form-item *ngIf="visible">
+    <nz-form-label nz-col *ngIf="labelVisible" [nzSpan]="labelSpan" [nzRequired]="required">
+        {{label}}
+        <span *ngIf="edit.label.tooltip" nz-tooltip [nzTooltipTitle]="edit.label.tooltip" style="margin-left: 2px;">
+            <i nz-tooltip nz-icon nzType="question-circle-o"></i>
+        </span>
+    </nz-form-label>
+    <nz-form-control nz-col *ngIf="inputVisible" [nzSpan]="labelVisible ? inputSpan : 24" [ngSwitch]="edit.input.type"
+        [nzValidateStatus]="status" [nzErrorTip]="error">
+        <app-input-password *ngSwitchCase="InputType.PASSWORD" [form]="form" [edit]="edit" [errors]="errors">
+        </app-input-password>
+        <app-input-number *ngSwitchCase="InputType.NUMBER" [form]="form" [edit]="edit" [errors]="errors">
+        </app-input-number>
+        <app-input-boolean *ngSwitchCase="InputType.BOOLEAN" [form]="form" [edit]="edit" [errors]="errors">
+        </app-input-boolean>
+        <app-input-datetime *ngSwitchCase="InputType.DATETIME" [form]="form" [edit]="edit" [errors]="errors">
+        </app-input-datetime>
+        <app-input-date *ngSwitchCase="InputType.DATE" [form]="form" [edit]="edit" [errors]="errors"></app-input-date>
+        <app-input-select *ngSwitchCase="InputType.SELECT" [form]="form" [edit]="edit" [errors]="errors">
+        </app-input-select>
+        <app-input-tree-select *ngSwitchCase="InputType.TREE_SELECT" [form]="form" [edit]="edit" [errors]="errors">
+        </app-input-tree-select>
+        <app-input-cascader *ngSwitchCase="InputType.CASCADER" [form]="form" [edit]="edit" [errors]="errors">
+        </app-input-cascader>
+        <app-input-textarea *ngSwitchCase="InputType.TEXTAREA" [form]="form" [edit]="edit" [errors]="errors">
+        </app-input-textarea>
+        <app-input-upload *ngSwitchCase="InputType.UPLOAD" [form]="form" [edit]="edit" [errors]="errors">
+        </app-input-upload>
+        <app-input-avatar *ngSwitchCase="InputType.AVATAR" [form]="form" [edit]="edit" [errors]="errors">
+        </app-input-avatar>
+        <app-input-captcha *ngSwitchCase="InputType.CAPTCHA" [form]="form" [edit]="edit" [errors]="errors">
+        </app-input-captcha>
+        <app-input-text *ngSwitchDefault [form]="form" [edit]="edit" [errors]="errors"></app-input-text>
+    </nz-form-control>
+</nz-form-item>
+<ng-template #error let-control>
+    <ul style="margin: 0px 0px 0px -10px" [style.listStyle]="errors[code].length === 1 ? 'none' : 'disc'">
+        <li *ngFor="let error of errors[code]">{{error}}</li>
+    </ul>
+</ng-template>

@@ -1,0 +1,24 @@
+.list {
+    height: 100%;
+
+    .title {
+        margin-bottom: 16px;
+
+        :nth-child(1) {
+            background-color: #1890ff;
+            margin-bottom: 2px;
+            margin-left: 1px;
+        }
+
+        :nth-child(2) {
+            color: rgb(0, 0, 0);
+            font-weight: 500;
+            font-size: 16px;
+        }
+    }
+
+    .table > nz-tree {
+        border: 1px solid #f0f0f0;
+        padding: 12px 0;
+    }
+}

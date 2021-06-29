@@ -1,0 +1,6 @@
+<app-list #listComponent title="角色列表" [fields]="fields" [listData]="listData" [toolbar]="listToolbar"
+    [action]="listAction" (expandChange)="expandChange($event)" [footerToolbar]="true"></app-list>
+<app-edit #editComponent title="角色编辑" [fields]="fields" [form]="editForm" [toolbar]="editToolbar" [errors]="errors">
+</app-edit>
+<app-edit-many-to-many #editManyToManyComponent title="分配权限" [toolbar]="grantToolbar">
+</app-edit-many-to-many>

@@ -1,0 +1,13 @@
+spring:
+  profiles:
+    active: support, security, system
+pengsoft:
+  security:
+    oauth:
+      authorization-server-enabled: true
+      resource-server-enabled: true
+      clients:
+        - id: pengsoft
+          secret: pengsoft
+          grant-types:
+            - password  

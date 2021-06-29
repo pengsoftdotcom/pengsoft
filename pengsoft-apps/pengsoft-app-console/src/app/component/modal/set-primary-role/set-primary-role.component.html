@@ -1,0 +1,3 @@
+<nz-radio-group [(ngModel)]="primary">
+    <label *ngFor="let item of items" nz-radio style="display: block; line-height: 30px;" [nzValue]="item.id">{{item.role.name}}</label>
+</nz-radio-group>

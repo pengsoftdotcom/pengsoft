@@ -1,0 +1,9 @@
+<nz-spin [nzSpinning]="loading">
+    <form nz-form>
+        <div nz-row [nzGutter]="24">
+            <div nz-col [nzSpan]="span" *ngFor="let field of fields">
+                <app-form-item [form]="form" [field]="field" [filterable]="true"></app-form-item>
+            </div>
+        </div>
+    </form>
+</nz-spin>

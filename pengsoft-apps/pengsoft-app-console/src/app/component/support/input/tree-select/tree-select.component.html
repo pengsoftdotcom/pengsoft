@@ -1,0 +1,12 @@
+<ng-container *ngIf="edit.input.lazy; else elseBlock">
+    <nz-tree-select [(ngModel)]="rawValue" (ngModelChange)="modelChange($event)" [nzNodes]="edit.input.options" nzAllowClear nzAsyncform
+        [nzPlaceHolder]="placeholder" [nzDisabled]="disabled" [nzMultiple]="edit.input.multiple" (nzExpandChange)="edit.input.load(this, $event)"
+        nzShowSearch nzHideUnMatched [nzDropdownStyle]="{maxHeight: '400px'}">
+    </nz-tree-select>
+</ng-container>
+<ng-template #elseBlock>
+    <nz-tree-select [(ngModel)]="rawValue" (ngModelChange)="modelChange($event)" [nzNodes]="edit.input.options" nzAllowClear
+        [nzPlaceHolder]="placeholder" [nzDisabled]="disabled" [nzMultiple]="edit.input.multiple" nzDefaultExpandAll nzShowSearch
+        [nzDropdownStyle]="{maxHeight: '400px'}">
+    </nz-tree-select>
+</ng-template>

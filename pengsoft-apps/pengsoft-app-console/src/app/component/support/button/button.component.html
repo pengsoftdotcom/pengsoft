@@ -1,0 +1,17 @@
+<ng-container *ngIf="type === 'link'; else elseBlock">
+    <a nz-button nzType="link" [nzDanger]="danger" (click)="action.emit()" [disabled]="disabled">
+        {{name}}
+    </a>
+    <nz-divider *ngIf="divider" nzType="vertical"></nz-divider>
+</ng-container>
+<ng-template #elseBlock>
+    <button nz-button [nzType]="type" [nzDanger]="danger" (click)="action.emit()" [disabled]="disabled"
+        [nzShape]="icon ? 'circle' : null">
+        <ng-container *ngIf="icon; else elseBlock">
+            <em nz-icon [nzType]="icon"></em>
+        </ng-container>
+        <ng-template #elseBlock>
+            {{name}}
+        </ng-template>
+    </button>
+</ng-template>

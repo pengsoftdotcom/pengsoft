@@ -1,0 +1,45 @@
+pengsoft:
+  transaction:
+    readonly:
+      - find*
+      - get*
+      - count*
+      - exists*
+spring:
+  redis:
+    host: ${REDIS_HOST}
+    port: ${REDIS_PORT}
+  messages:
+    basename: META-INF/messages, org/hibernate/validator/ValidationMessages
+  datasource:
+    url: ${JDBC_URL}
+    username: ${JDBC_USERNAME}
+    password: ${JDBC_PASSWORD}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: update
+    properties:
+#      javax.persistence.validation.mode: none
+      "[hibernate.dialect]": org.hibernate.dialect.PostgreSQL10Dialect
+      "[hibernate.format_sql]": true
+      "[hibernate.jdbc.fetch_size]": 25
+      "[hibernate.jdbc.batch_size]": 25
+      "[hibernate.order_inserts]": true
+      "[hibernate.order_updates]": true
+      "[hibernate.generate_statistics]": false
+      "[hibernate.enable_lazy_load_no_trans]": true
+      "[hibernate.physical_naming_strategy]": org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
+      "[hibernate.implicit_naming_strategy]": org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
+      "[hibernate.cache.use_second_level_cache]": true
+      "[hibernate.cache.use_query_cache]": true
+      "[hibernate.cache.redisson.fallback]": true
+      "[hibernate.cache.redisson.config]": META-INF/redisson.yaml
+      "[hibernate.cache.region.factory_class]": org.redisson.hibernate.RedissonRegionFactory
+logging:
+  level:
+    root: info
+    web: debug
+    "[com.pengsoft]": debug
+    "[org.hibernate.SQL]": debug
+    "[org.hibernate.type.descriptor.sql.BasicBinder]": trace

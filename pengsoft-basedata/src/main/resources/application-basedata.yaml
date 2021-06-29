@@ -1,0 +1,3 @@
+spring:
+  messages:
+    basename: META-INF/messages, META-INF/messages-security, META-INF/messages-system, META-INF/messages-basedata

@@ -1,0 +1,38 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Launch Asset",
+            "request": "launch",
+            "mainClass": "com.pengsoft.system.domain.Asset",
+            "projectName": "pengsoft-system"
+        },
+        {
+            "type": "java",
+            "name": "Launch OrganizationFacadeImpl",
+            "request": "launch",
+            "mainClass": "com.pengsoft.basedata.facade.OrganizationFacadeImpl",
+            "projectName": "pengsoft-basedata"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-MonolithicApplication<pengsoft-monolithic>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "mainClass": "com.pengsoft.monolithic.MonolithicApplication",
+            "projectName": "pengsoft-monolithic",
+            "args": ""
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-BasedataApplication<pengsoft-basedata>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "mainClass": "com.pengsoft.basedata.BasedataApplication",
+            "projectName": "pengsoft-basedata",
+            "args": ""
+        }
+    ]
+}

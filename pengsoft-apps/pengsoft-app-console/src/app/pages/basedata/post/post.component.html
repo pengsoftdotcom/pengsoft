@@ -1,0 +1,4 @@
+<app-list #listComponent [title]="(title ? title : '') + '职务列表'" [fields]="fields" [listData]="listData"
+    [toolbar]="listToolbar" [action]="listAction"></app-list>
+<app-edit #editComponent [title]="(title ? title : '') + '职务编辑'" [fields]="fields" [form]="editForm"
+    [toolbar]="editToolbar" [errors]="errors"></app-edit>

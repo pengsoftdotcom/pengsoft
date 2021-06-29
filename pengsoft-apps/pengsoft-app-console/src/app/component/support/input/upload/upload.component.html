@@ -1,0 +1,4 @@
+<nz-upload [nzAction]="path" [nzHeaders]="headers" nzName="file" [(nzFileList)]="files" (nzChange)="modelChange($event)" [nzDownload]="download"
+    [nzRemove]="remove">
+    <button nz-button type="button"><i nz-icon nzType="upload"></i><span>点击上传</span></button>
+</nz-upload>

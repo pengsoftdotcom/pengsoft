@@ -1,0 +1,7 @@
+<app-list #listComponent title="机构列表" [fields]="fields" [listData]="listData" [toolbar]="listToolbar"
+    [action]="listAction"></app-list>
+<app-edit-organization #editComponent title="机构编辑" [fields]="fields" [form]="editForm" [toolbar]="editToolbar"
+    [errors]="errors">
+</app-edit-organization>
+<app-edit-one-to-many #postsComponent></app-edit-one-to-many>
+<app-edit-one-to-many #departmentsComponent></app-edit-one-to-many>

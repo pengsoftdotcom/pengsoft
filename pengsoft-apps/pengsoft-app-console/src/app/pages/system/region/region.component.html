@@ -1,0 +1,4 @@
+<app-list #listComponent title="行政区划列表" [fields]="fields" [listData]="listData" [toolbar]="listToolbar"
+    [action]="listAction" (expandChange)="expandChange($event)" [footerToolbar]="true"></app-list>
+<app-edit #editComponent title="行政区划编辑" [fields]="fields" [form]="editForm" [toolbar]="editToolbar" [errors]="errors">
+</app-edit>

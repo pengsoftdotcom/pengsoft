@@ -1,0 +1,4 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration= \
+com.pengsoft.security.config.DefaultWebSecurityConfigurer, \
+com.pengsoft.security.config.DefaultAuthorizationServerConfigurer, \
+com.pengsoft.security.config.DefaultResourceServerConfigurer

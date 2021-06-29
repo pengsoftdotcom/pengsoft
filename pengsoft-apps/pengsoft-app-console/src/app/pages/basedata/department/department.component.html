@@ -1,0 +1,7 @@
+<app-list #listComponent [title]="(title ? title : '') + '部门列表'" [fields]="fields" [listData]="listData"
+    [toolbar]="listToolbar" [action]="listAction"></app-list>
+<app-edit #editComponent [title]="(title ? title : '') + '部门编辑'" [fields]="fields" [form]="editForm"
+    [toolbar]="editToolbar" [errors]="errors">
+</app-edit>
+<app-edit-one-to-many #jobsComponent></app-edit-one-to-many>
+<app-edit-one-to-many #staffComponent></app-edit-one-to-many>

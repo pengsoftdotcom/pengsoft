@@ -1,0 +1,9 @@
+<nz-input-group [nzPrefix]="prefix" [nzSuffix]="suffix">
+    <input nz-input [(ngModel)]="form[edit.code]" (ngModelChange)="modelChange($event)" [placeholder]="placeholder" [disabled]="disabled">
+</nz-input-group>
+<ng-template #prefix>
+    <i nz-icon *ngIf="edit.input.prefixIcon" [nzType]="edit.input.prefixIcon" nzTheme="outline"></i>
+</ng-template>
+<ng-template #suffix>
+    <i nz-icon *ngIf="edit.input.suffixIcon" [nzType]="edit.input.suffixIcon" nzTheme="outline"></i>
+</ng-template>

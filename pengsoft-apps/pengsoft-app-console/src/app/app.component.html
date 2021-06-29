@@ -1,0 +1,131 @@
+<nz-layout class="app-layout">
+    <nz-sider class="menu-sidebar" nzCollapsible nzWidth="256px" nzBreakpoint="md" [(nzCollapsed)]="isCollapsed"
+        [nzTrigger]="null">
+        <div class="sidebar-logo">
+            <a routerLink="/dashboard">
+                <img src="/assets/logo.png" alt="logo">
+                <h1>Pengsoft.com</h1>
+            </a>
+        </div>
+        <ul nz-menu nzTheme="dark" nzMode="inline" [nzInlineCollapsed]="isCollapsed">
+            <ng-container *ngFor="let menu of menus">
+                <ng-container *ngIf="!menu.children; else elseBlock">
+                    <li nz-menu-item [hasAnyAuthority]="getMenuAuthority(menu)" [title]="menu.data.exclusive"
+                        [nzMatchRouter]="true" [routerLink]="menu.path">
+                        <em nz-icon [nzType]="menu.data.icon"></em><span>{{menu.data.name}}</span>
+                    </li>
+                </ng-container>
+                <ng-template #elseBlock>
+                    <li nz-submenu [hasAnyAuthority]="getMenuAuthority(menu)" [title]="menu.data.exclusive"
+                        [nzTitle]="menu.data.name" [nzIcon]="menu.data.icon" [nzOpen]="isMenuOpen(menu)">
+                        <ul>
+                            <li *ngFor="let submenu of menu.children" nz-menu-item
+                                [hasAnyAuthority]="submenu.data?.code" [title]="submenu.data.exclusive"
+                                [nzMatchRouter]="true" [routerLink]="'/' + menu.path + '/' + submenu.path">
+                                {{submenu.data.name}}
+                            </li>
+                        </ul>
+                    </li>
+                </ng-template>
+            </ng-container>
+        </ul>
+    </nz-sider>
+    <nz-layout>
+        <nz-header>
+            <div class="app-header">
+                <span class="header-trigger" (click)="isCollapsed = !isCollapsed">
+                    <em class="trigger" nz-icon [nzType]="isCollapsed ? 'menu-unfold' : 'menu-fold'"></em>
+                </span>
+                <span class="header-person" nz-dropdown [nzDropdownMenu]="person" nzTrigger="click">
+                    <ng-container *ngTemplateOutlet="avatar; context: {userDetails: userDetails}"></ng-container>
+                </span>
+                <nz-dropdown-menu #person>
+                    <ul nz-menu>
+                        <li nz-menu-item class="person" nzDisabled>
+                            <ng-container *ngTemplateOutlet="avatar; context: {userDetails: userDetails}">
+                            </ng-container>
+                            <span class="name">{{name}}</span>
+                            <div class="menu">
+                                <a (click)="editPerson()">基本资料</a>
+                                <nz-divider nzType="vertical"></nz-divider>
+                                <ng-container *ngIf="userDetails?.jobs?.length > 0">
+                                    <a nz-button nzType="link" (click)="switchJob()"
+                                        [disabled]="userDetails?.jobs?.length === 1">切换职位</a>
+                                    <nz-divider nzType="vertical"></nz-divider>
+                                </ng-container>
+                                <ng-container *ngIf="!userDetails?.jobs && userDetails?.roles?.length > 0">
+                                    <a nz-button nzType="link" (click)="switchRole()"
+                                        [disabled]="userDetails?.roles?.length === 1">切换角色</a>
+                                    <nz-divider nzType="vertical"></nz-divider>
+                                </ng-container>
+                                <ng-container
+                                    *ngIf="userDetails?.currentRole?.code === 'organization_admin' && userDetails?.organizations?.length > 1">
+                                    <a (click)="switchOrganization()">切换机构</a>
+                                    <nz-divider nzType="vertical"></nz-divider>
+                                </ng-container>
+                                <a (click)="changePassword()">修改密码</a>
+                            </div>
+                        </li>
+                        <li nz-menu-divider></li>
+                        <li nz-menu-item class="sign-out" (click)="signOut()">退出登录</li>
+                    </ul>
+                </nz-dropdown-menu>
+            </div>
+        </nz-header>
+        <nz-content>
+            <div class="inner-content">
+                <router-outlet></router-outlet>
+            </div>
+        </nz-content>
+        <nz-footer>Copyright ©2020 Pengsoft Inc. All rights reserved.</nz-footer>
+    </nz-layout>
+</nz-layout>
+<ng-template #avatar let-userDetails="userDetails">
+    <ng-container *ngIf="userDetails?.person?.avatar?.accessPath; else elseBlock">
+        <nz-avatar [nzSize]="28" nzSrc="avatar"></nz-avatar>
+    </ng-container>
+    <ng-template #elseBlock>
+        <nz-avatar [nzSize]="28" nzIcon="user" style="background-color:#1890ff;"></nz-avatar>
+    </ng-template>
+</ng-template>
+<ng-template #jobs>
+    <div nz-row>
+        <div nz-col nzSpan="16">
+            <div *ngFor="let job of userDetails.jobs" style="line-height: 30px;">
+                {{job.organization.name}} {{job.name}}
+            </div>
+        </div>
+        <div nz-col nzSpan="8">
+            <nz-radio-group [(ngModel)]="userDetails.primaryJob" (ngModelChange)="primaryJobChanged()">
+                <label *ngFor="let job of userDetails.jobs" nz-radio [nzValue]="job">主要</label>
+            </nz-radio-group>
+        </div>
+    </div>
+</ng-template>
+<ng-template #roles>
+    <div nz-row>
+        <div nz-col nzSpan="16">
+            <div *ngFor="let role of userDetails.roles" style="line-height: 30px;">{{role.name}}</div>
+        </div>
+        <div nz-col nzSpan="8" style="text-align: right;">
+            <nz-radio-group [(ngModel)]="userDetails.primaryRole.id" (ngModelChange)="primaryRoleChanged()">
+                <label *ngFor="let role of userDetails.roles" nz-radio [nzValue]="role.id">主要</label>
+            </nz-radio-group>
+        </div>
+    </div>
+</ng-template>
+<ng-template #organizations>
+    <div nz-row>
+        <div nz-col nzSpan="16">
+            <div *ngFor="let organization of userDetails.organizations" style="line-height: 30px;">
+                {{organization.name}}
+            </div>
+        </div>
+        <div nz-col nzSpan="4">
+            <nz-radio-group [(ngModel)]="userDetails.organization" (ngModelChange)="primaryOrganizationChanged()">
+                <label *ngFor="let organization of userDetails.organizations" nz-radio
+                    [nzValue]="organization">当前</label>
+            </nz-radio-group>
+        </div>
+    </div>
+</ng-template>

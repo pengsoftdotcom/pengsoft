@@ -1,0 +1,34 @@
+<ng-template #content>
+    <nz-spin [nzSpinning]="loading">
+        <div class="edit">
+            <nz-tabset>
+                <nz-tab nzTitle="基本信息">
+                    <form nz-form [style.height]="(formHeight - 45) + 'px'">
+                        <div nz-row [nzGutter]="24">
+                            <div nz-col [nzSpan]="span" *ngFor="let field of personFields">
+                                <app-form-item [form]="form.person" [field]="field" [errors]="errors"></app-form-item>
+                            </div>
+                        </div>
+                    </form>
+                </nz-tab>
+                <nz-tab nzTitle="职位信息">
+                    <form nz-form [style.height]="(formHeight - 45) + 'px'">
+                        <div nz-row [nzGutter]="24">
+                            <div nz-col [nzSpan]="span" *ngFor="let field of jobFields">
+                                <app-form-item [form]="form" [field]="field" [errors]="errors"></app-form-item>
+                            </div>
+                        </div>
+                    </form>
+                </nz-tab>
+            </nz-tabset>
+            <div class="toolbar">
+                <nz-space>
+                    <ng-container *ngFor="let button of toolbar">
+                        <app-button *nzSpaceItem [name]="button.name" [type]="button.type" [danger]="button.danger"
+                            [divider]="button.divider" [size]="button.size" (action)="button.action()"></app-button>
+                    </ng-container>
+                </nz-space>
+            </div>
+        </div>
+    </nz-spin>
+</ng-template>

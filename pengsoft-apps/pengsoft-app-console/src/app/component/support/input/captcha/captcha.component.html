@@ -1,0 +1,11 @@
+<nz-input-group [nzPrefix]="prefix" [nzSuffix]="suffix">
+    <input nz-input [(ngModel)]="form[edit.code]" (ngModelChange)="modelChange($event)" [placeholder]="placeholder"
+        [disabled]="disabled" maxlength="6">
+</nz-input-group>
+<ng-template #prefix>
+    <em nz-icon *ngIf="edit.input.prefixIcon" [nzType]="edit.input.prefixIcon" nzTheme="outline"></em>
+</ng-template>
+<ng-template #suffix>
+    <ng-container *ngIf="generated; else elseBlock"><a>{{seconds}} 秒后重发</a></ng-container>
+    <ng-template #elseBlock><a (click)="generate()">发送验证码</a></ng-template>
+</ng-template>

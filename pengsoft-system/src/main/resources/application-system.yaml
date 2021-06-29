@@ -1,0 +1,20 @@
+pengsoft:
+  security:
+    uris-permitted:
+      - /api/captcha/generate
+      - /api/user-details/reset-password
+  captcha:
+    verification-required-uris:
+      - /api/user-details/reset-password
+  storage:
+    enabled: true
+    access-key-id: ${OSS_ACCESS_KEY_ID}
+    access-key-secret: ${OSS_ACCESS_KEY_SECRET}
+    public-bucket: ${OSS_PUBLIC_BUCKET_NAME}
+    locked-bucket: ${OSS_LOCKED_BUCKET_NAME}
+    endpoint: ${OSS_ENDPOINT}
+    public-access-path-prefix: ${OSS_PUBLIC_BUCKET_ACCESS_PATH_PREFIX}
+    locked-access-path-prefix: ${OSS_LOCKED_BUCKET_ACCESS_PATH_PREFIX}
+spring:
+  messages:
+    basename: META-INF/messages, META-INF/messages-security, META-INF/messages-system

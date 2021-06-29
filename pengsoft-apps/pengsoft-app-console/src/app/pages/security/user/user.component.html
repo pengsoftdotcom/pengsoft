@@ -1,0 +1,6 @@
+<app-list #listComponent title="用户列表" [fields]="fields" [listData]="listData" [pageData]="pageData"
+    [toolbar]="listToolbar" [action]="listAction" (pageChange)="list()"></app-list>
+<app-edit #editComponent title="用户编辑" [fields]="fields" [form]="editForm" [toolbar]="editToolbar" [errors]="errors"
+    [labelSpan]="6">
+</app-edit>
+<app-edit-many-to-many #userRolesComponent title="分配角色" [toolbar]="grantToolbar"></app-edit-many-to-many>

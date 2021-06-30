@@ -63,16 +63,6 @@ public class SecurityUtils {
         }
     }
 
-    public static boolean hasAnyAuthority(final String... authorityCodes) {
-        final var userDetails = getUserDetails();
-        if (userDetails == null) {
-            return false;
-        } else {
-            return userDetails.getAuthorities().stream().anyMatch(authority -> Arrays.stream(authorityCodes)
-                    .anyMatch(authorityCode -> authorityCode.equals(authority.getAuthority())));
-        }
-    }
-
     /**
      * Returns the current user.
      */

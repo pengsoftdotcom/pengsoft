@@ -107,8 +107,7 @@ export class StaffComponent extends EntityComponent<StaffService> implements OnI
         this.listAction.splice(0, 0, {
             name: '重置密码',
             type: 'link',
-            divider: true,
-            width: 75,
+            width: 58,
             authority: 'security::user::reset_password',
             action: (row: any) => this.resetPassword(row)
         });

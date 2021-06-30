@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Injectable, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { NzTreeNodeOptions } from 'ng-zorro-antd/tree';
 import { SecurityService } from 'src/app/service/support/security.service';
@@ -126,12 +126,19 @@ export class ListComponent extends BaseComponent implements OnInit {
         const checkAllWidth = 46;
         const sortWidth = 82;
         let actionWidth = 17;
-        this.action = this.action.filter(button => !button.authority || this.security.hasAnyAuthority(button.authority));
-        if (this.action.length === 1 && this.action[0].divider) {
-            this.action[0].divider = false;
-            this.action[0].width = this.action[0].width - 17;
+        this.action = this.action.filter(button => this.security.hasAnyAuthority(button.authority, button.exclusive));
+        this.action.forEach((button, index) => {
+            actionWidth += button.width;
+            if (index + 1 < this.action.length) {
+                button.divider = true;
+                actionWidth += 17;
+            } else {
+                button.divider = false;
+            }
+        });
+        if (actionWidth === 17) {
+            actionWidth = 94;
         }
-        this.action.forEach(button => actionWidth += button.width);
         this.tableWidthConfig.push(checkAllWidth);
         this.fields.forEach(field => {
             if (field.children) {

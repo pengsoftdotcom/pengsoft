@@ -115,7 +115,7 @@ export class JobComponent extends TreeEntityComponent<JobService> implements OnI
         super.initListAction();
         this.listAction.splice(0, 0,
             {
-                name: '分配角色', type: 'link', divider: true, width: 75, authority: this.getAuthority('findAllJobRolesByJob'),
+                name: '分配角色', type: 'link', width: 58, authority: this.getAuthority('findAllJobRolesByJob'),
                 action: (row: any) => this.editGrantedRoles(row)
             }
         );

@@ -25,6 +25,7 @@ import { NzTreeModule } from 'ng-zorro-antd/tree';
 import { NzTreeSelectModule } from 'ng-zorro-antd/tree-select';
 import { NzUploadModule } from 'ng-zorro-antd/upload';
 import { DirectiveModule } from '../directive/directive.module';
+import { HasAnyAuthorityDirective } from '../directive/has-any-authority.directive';
 import { IconsProviderModule } from '../icons-provider.module';
 import { ChangePasswordComponent } from './modal/change-password/change-password.component';
 import { ForgetPasswordComponent } from './modal/forget-password/forget-password.component';
@@ -122,7 +123,8 @@ import { ListComponent } from './support/list/list.component';
         EditOneToManyComponent,
         FormItemComponent,
         ListComponent,
-        UploadComponent
+        UploadComponent,
+        HasAnyAuthorityDirective
     ]
 })
 export class ComponentModule { }

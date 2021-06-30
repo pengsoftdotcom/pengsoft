@@ -7,7 +7,6 @@
         <nz-tree *ngIf="navData" nz-col nzSpan="4" [nzData]="navData" nzBlockNode nzExpandAll
             [nzVirtualHeight]="tableNavHeight + 'px'" (nzClick)="nav.emit($event)"></nz-tree>
         <div nz-col [nzSpan]="navData ? 20: 24">
-            <!-- [nzScroll]="{ y: tableBodyHeight }" -->
             <nz-table #table nzBordered nzSize="middle" [nzLoading]="loading" [nzWidthConfig]="tableWidthConfig"
                 [nzData]="listData" [nzTitle]="toolbarTemplate" [nzFooter]="footerToolbar ? toolbarTemplate : null"
                 [nzFrontPagination]="false" [nzShowPagination]="pageable" [(nzPageIndex)]="pageData.page"
@@ -16,30 +15,30 @@
                 [nzPageSizeOptions]="[20, 50, 100]" (nzPageSizeChange)="pageChange.emit()">
                 <thead>
                     <tr>
-                        <th [attr.rowspan]="getRowspan()" colspan="1" nzShowCheckbox [(nzChecked)]="allChecked"
-                            [nzIndeterminate]="indeterminate" (nzCheckedChange)="checkAll($event)">
+                        <th id="checkbox" [attr.rowspan]="getRowspan()" colspan="1" nzShowCheckbox
+                            [(nzChecked)]="allChecked" [nzIndeterminate]="indeterminate"
+                            (nzCheckedChange)="checkAll($event)">
                         </th>
                         <ng-container *ngFor="let field of fields">
-                            <th *ngIf="field.list.visible" nzAlign="center" [attr.rowspan]="getRowspan(field)"
-                                [attr.colspan]="getColspan(field)" [nzShowSort]="field.list.sortable && !treeable"
+                            <th id="dataColumn" *ngIf="field.list.visible" nzAlign="center"
+                                [attr.rowspan]="getRowspan(field)" [attr.colspan]="getColspan(field)"
+                                [nzShowSort]="field.list.sortable && !treeable"
                                 (nzSortOrderChange)="sortChange(field, $event)">
                                 {{field.list.label ? field.list.label : field.name}}
                             </th>
                         </ng-container>
-                        <th *ngIf="sortable" nzAlign="center" [attr.rowspan]="getRowspan()" colspan="1"
+                        <th *ngIf="sortable" id="sortColumn" nzAlign="center" [attr.rowspan]="getRowspan()" colspan="1"
                             nzAlign="center">
                             <a (click)="sequenceChange.emit()">排序</a>
                         </th>
-                        <th nzAlign="center" [attr.rowspan]="getRowspan()" colspan="1">
-                            <!-- <span style="position: relative;" [style.left]="isWindows ? '10px' : 0"> -->
+                        <th nzAlign="center" id="operationColumn" [attr.rowspan]="getRowspan()" colspan="1">
                             操作
-                            <!-- </span> -->
                         </th>
                     </tr>
                     <tr *ngIf="groupable">
                         <ng-container *ngFor="let field of fields">
                             <ng-container *ngFor="let subfield of field.children">
-                                <th *ngIf="subfield.list.visible" nzAlign="center">
+                                <th *ngIf="subfield.list.visible" id="subDataColumn" nzAlign="center">
                                     {{subfield.list.label ? subfield.list.label : subfield.name}}
                                 </th>
                             </ng-container>
@@ -70,10 +69,11 @@
                                 </nz-input-number>
                             </td>
                             <td>
-                                <app-button *ngFor="let button of action" [hasAnyAuthority]="button.authority"
-                                    [name]="button.name" [type]="button.type" [danger]="button.danger"
-                                    [divider]="button.divider" [size]="button.size" [icon]="button.icon"
-                                    [disabled]="isButtonDisabled(button, row)" (action)="button.action(row)">
+                                <app-button *ngFor="let button of action" [title]="button.exclusive"
+                                    [hasAnyAuthority]="button.authority" [name]="button.name" [type]="button.type"
+                                    [danger]="button.danger" [divider]="button.divider" [size]="button.size"
+                                    [icon]="button.icon" [disabled]="isButtonDisabled(button, row)"
+                                    (action)="button.action(row)">
                                 </app-button>
                             </td>
                         </tr>
@@ -90,9 +90,10 @@
 <ng-template #toolbarTemplate>
     <nz-space>
         <ng-container *ngFor="let button of toolbar">
-            <app-button *nzSpaceItem [hasAnyAuthority]="button.authority" [name]="button.name" [type]="button.type"
-                [danger]="button.danger" [divider]="button.divider" [size]="button.size" [icon]="button.icon"
-                [disabled]="isButtonDisabled(button)" (action)="button.action()">
+            <app-button *nzSpaceItem [title]="button.exclusive" [hasAnyAuthority]="button.authority"
+                [name]="button.name" [type]="button.type" [danger]="button.danger" [divider]="button.divider"
+                [size]="button.size" [icon]="button.icon" [disabled]="isButtonDisabled(button)"
+                (action)="button.action()">
             </app-button>
         </ng-container>
     </nz-space>

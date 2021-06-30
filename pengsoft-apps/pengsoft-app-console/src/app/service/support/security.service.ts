@@ -54,19 +54,28 @@ export class SecurityService {
         return ['/oauth/token'];
     }
 
-    hasAnyAuthority(authorityCodes: string): boolean {
-        if (authorityCodes) {
-            let codes: Array<string>;
-            if (authorityCodes.indexOf(',') === -1) {
-                codes = [authorityCodes];
+    hasAnyAuthority(authorityString: string, exclusive?: string): boolean {
+        const authorities = [];
+        if (authorityString) {
+            if (authorityString.indexOf(',') === -1) {
+                authorities.push(authorityString);
             } else {
-                codes = authorityCodes.split(',').map(code => code.trim());
-            }
-            if (this.userDetails && this.userDetails.authorities) {
-                return codes.some(code => this.userDetails.authorities.some(authority => authority === code));
+                authorityString.split(',')
+                    .map(authority => authority.trim())
+                    .forEach(authority => authorities.push(authority));
             }
         }
-        return false;
+        const userAuthorities: Array<string> = this.userDetails && this.userDetails.authorities ? this.userDetails.authorities : [];
+        if (authorities.length > 0) {
+            if (authorities.some(authority => userAuthorities.includes(authority))) {
+                if (exclusive && userAuthorities.includes(exclusive)) {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        }
+        return true;
     }
 
 }

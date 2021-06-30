@@ -48,6 +48,9 @@ export class AppComponent {
             (route) => route.data || route.children
         );
         this.userDetails = this.security.userDetails;
+        if (security.isNotAuthenticated()) {
+            this.signIn();
+        }
     }
 
     getMenuAuthority(route: Route): string {

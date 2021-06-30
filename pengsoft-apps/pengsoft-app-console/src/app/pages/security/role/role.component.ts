@@ -72,8 +72,7 @@ export class RoleComponent extends TreeEntityComponent<RoleService> {
         this.listAction.splice(0, 0, {
             name: '分配权限',
             type: 'link',
-            divider: true,
-            width: 75,
+            width: 58,
             authority: this.getAuthority('findAllRoleAuthoritiesByRole'),
             action: (row: any) => this.editGrantedAuthorities(row)
         });

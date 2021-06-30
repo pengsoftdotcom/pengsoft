@@ -24,7 +24,8 @@
             <div class="toolbar">
                 <nz-space>
                     <ng-container *ngFor="let button of toolbar">
-                        <app-button *nzSpaceItem [name]="button.name" [type]="button.type" [danger]="button.danger"
+                        <app-button *nzSpaceItem [title]="button.exclusive" [hasAnyAuthority]="button.authority"
+                            [name]="button.name" [type]="button.type" [danger]="button.danger"
                             [divider]="button.divider" [size]="button.size" (action)="button.action()"></app-button>
                     </ng-container>
                 </nz-space>

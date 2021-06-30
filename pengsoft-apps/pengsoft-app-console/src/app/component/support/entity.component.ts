@@ -72,7 +72,7 @@ export abstract class EntityComponent<S extends EntityService> extends BaseCompo
     initListToolbar(): void {
         this.listToolbar = [
             { name: '刷新', icon: 'reload', action: () => this.list(), authority: this.getAuthority('findPage') + ', ' + this.getAuthority('findAll') },
-            { name: '新增', type: 'primary', action: () => this.edit(), authority: this.getAuthority('findOne') },
+            { name: '新增', type: 'primary', action: () => this.edit(), authority: this.getAuthority('save') },
             { name: '批量删除', type: 'primary', danger: true, action: () => this.delete(), authority: this.getAuthority('delete') }
         ];
         if (this.fields.some(field => field.filter)
@@ -88,7 +88,8 @@ export abstract class EntityComponent<S extends EntityService> extends BaseCompo
 
     initListAction(): void {
         this.listAction = [
-            { name: '修改', type: 'link', divider: true, width: 47, action: (row: any) => this.edit(row), authority: this.getAuthority('findOne') },
+            { name: '查看', type: 'link', width: 30, action: (row: any) => this.edit(row), authority: this.getAuthority('findOne'), exclusive: this.getAuthority('save') },
+            { name: '修改', type: 'link', width: 30, action: (row: any) => this.edit(row), authority: this.getAuthority('save') },
             { name: '删除', type: 'link', danger: true, width: 30, action: (row: any) => this.delete(row), authority: this.getAuthority('delete') }
         ];
     }

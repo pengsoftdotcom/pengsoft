@@ -47,8 +47,7 @@ export class DictionaryTypeComponent extends EntityComponent<DictionaryTypeServi
         this.listAction.splice(0, 0, {
             name: '详情',
             type: 'link',
-            divider: true,
-            width: 47,
+            width: 30,
             authority: 'system::dictionary_item::find_all',
             action: (row: any) => this.editItems(row)
         });

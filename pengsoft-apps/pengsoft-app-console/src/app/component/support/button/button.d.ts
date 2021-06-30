@@ -4,6 +4,8 @@ export interface Button {
 
     authority?: string;
 
+    exclusive?: string;
+
     type?: 'primary' | 'default' | 'link';
 
     alignRight?: boolean;

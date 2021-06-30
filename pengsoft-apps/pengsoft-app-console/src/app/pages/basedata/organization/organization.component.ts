@@ -84,10 +84,10 @@ export class OrganizationComponent extends TreeEntityComponent<OrganizationServi
     initListAction(): void {
         super.initListAction();
         this.listAction.splice(0, 0, {
-            name: '部门', type: 'link', divider: true, width: 47, authority: 'basedata::department::find_all',
+            name: '部门', type: 'link', width: 30, authority: 'basedata::department::find_all',
             action: (row: any) => this.editDepartments(row)
         }, {
-            name: '职务', type: 'link', divider: true, width: 47, authority: 'basedata::post::find_all',
+            name: '职务', type: 'link', width: 30, authority: 'basedata::post::find_all',
             action: (row: any) => this.editPosts(row)
         });
     }

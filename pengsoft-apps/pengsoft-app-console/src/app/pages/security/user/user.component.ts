@@ -90,7 +90,7 @@ export class UserComponent extends EntityComponent<UserService> {
             FieldUtils.buildSelect({
                 code: 'locale', name: '语言',
                 list: {
-                    width: 80, align: 'center',
+                    width: 63, align: 'center',
                     render: (field: Field, row: any) => field.edit.input.options
                         .filter(option => EntityUtils.equals(option.value, row[field.code]))[0].label
                 },
@@ -105,7 +105,7 @@ export class UserComponent extends EntityComponent<UserService> {
                 filter: {}
             }),
             FieldUtils.buildDatetime({ code: 'signedInAt', name: '登录时间', edit: { disabled: true, input: { placeholder: '尚未登录' } } }),
-            FieldUtils.buildNumber({ code: 'signInFailureCount', name: '今日登录失败次数', list: { width: 150 } }),
+            FieldUtils.buildNumber({ code: 'signInFailureCount', name: '今日登录失败次数', list: { width: 133 } }),
             FieldUtils.buildDatetimeForExpiredAt(),
             FieldUtils.buildBooleanForEnabled()
         ];
@@ -116,15 +116,13 @@ export class UserComponent extends EntityComponent<UserService> {
         this.listAction.splice(0, 0, {
             name: '重置密码',
             type: 'link',
-            divider: true,
-            width: 75,
+            width: 58,
             authority: this.getAuthority('resetPassword'),
             action: (row: any) => this.resetPassword(row)
         }, {
             name: '分配角色',
             type: 'link',
-            divider: true,
-            width: 75,
+            width: 58,
             authority: this.getAuthority('findAllUserRolesByUser'),
             action: (row: any) => this.editGrantedRoles(row)
         });

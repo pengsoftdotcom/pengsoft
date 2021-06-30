@@ -14,8 +14,7 @@ export class HasAnyAuthorityDirective implements OnInit {
     constructor(private el: ElementRef, private security: SecurityService) { }
 
     ngOnInit(): void {
-        if (this.security.hasAnyAuthority(this.authorityCodes) && this.exclusive && this.security.hasAnyAuthority(this.exclusive)
-            || !this.security.hasAnyAuthority(this.authorityCodes)) {
+        if (!this.security.hasAnyAuthority(this.authorityCodes, this.exclusive)) {
             this.el.nativeElement.remove();
         }
     }

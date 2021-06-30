@@ -73,10 +73,10 @@ export class DepartmentComponent extends TreeEntityComponent<DepartmentService> 
     initListAction(): void {
         super.initListAction();
         this.listAction.splice(0, 0, {
-            name: '职位', type: 'link', divider: true, width: 47, authority: 'basedata::job::find_all',
+            name: '职位', type: 'link', width: 30, authority: 'basedata::job::find_all',
             action: (row: any) => this.editJobs(row)
         }, {
-            name: '员工', type: 'link', divider: true, width: 47, authority: 'basedata::staff::find_all',
+            name: '员工', type: 'link', width: 30, authority: 'basedata::staff::find_all',
             action: (row: any) => this.editStaff(row)
         });
     }

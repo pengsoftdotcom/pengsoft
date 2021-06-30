@@ -35,7 +35,7 @@ export class CaptchaComponent extends EntityComponent<CaptchaService> {
     initFields(): void {
         UserComponent.prototype.initFields();
         this.fields = [
-            FieldUtils.buildTextForCode({ width: 120, align: 'center', sortable: false }),
+            FieldUtils.buildTextForCode({ width: 103, align: 'center', sortable: false }),
             FieldUtils.buildDatetimeForExpiredAt(),
             FieldUtils.buildText({
                 code: 'user', name: '用户',

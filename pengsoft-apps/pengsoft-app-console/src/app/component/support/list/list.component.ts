@@ -37,19 +37,17 @@ export class ListComponent extends BaseComponent implements OnInit {
 
     @Input() sortable = false;
 
-    @Input() footerToolbar = false;
-
     @Output() sequenceChange = new EventEmitter<any>();
 
     @Output() nav = new EventEmitter<any>();
 
     @ViewChild('table', { static: true }) table: any;
 
-    tableNavHeight: any = 0;
+    navHeight: any = 0;
 
-    tableBodyHeight: any = 0;
+    bodyHeight: any = 0;
 
-    tableWidthConfig = [];
+    widthConfig = [];
 
     allChecked = false;
 
@@ -78,8 +76,8 @@ export class ListComponent extends BaseComponent implements OnInit {
         this.initGroupable();
         this.initTreeable();
         this.initPageable();
-        this.initTableWidthConfig();
-        this.initTableBodyHeight();
+        this.initWidthConfig();
+        this.initBodyHeight();
     }
 
     private initVisibleFields() {
@@ -107,24 +105,38 @@ export class ListComponent extends BaseComponent implements OnInit {
         }
     }
 
-    private initTableBodyHeight() {
-        const totalHeight = this.table.elementRef.nativeElement.parentNode.parentNode.parentNode.offsetHeight - 46;
-        this.tableNavHeight = totalHeight - 24;
+    private initBodyHeight() {
+        const totalHeight = this.table.elementRef.nativeElement.parentNode.parentNode.parentNode.offsetHeight - 64;
+        this.navHeight = totalHeight - 24;
 
-        const listTitleHeight = 41;
-        const toolbarButtonsHeight = 57;
-        const tableHeaderHeight = this.groupable ? 47 * 2 : 47;
+        const titleHeight = 41;
+        const toolbarHeight = 57;
+        const headerHeight = this.groupable ? 47 * 2 : 47;
 
-        this.tableBodyHeight = totalHeight;
-        this.tableBodyHeight -= listTitleHeight;
-        this.tableBodyHeight -= toolbarButtonsHeight;
-        this.tableBodyHeight -= tableHeaderHeight;
-        this.tableBodyHeight += 'px';
+        this.bodyHeight = totalHeight;
+        this.bodyHeight -= titleHeight;
+        this.bodyHeight -= toolbarHeight;
+        this.bodyHeight -= headerHeight;
+        this.bodyHeight += 'px';
     }
 
-    private initTableWidthConfig() {
+    private initWidthConfig() {
         const checkAllWidth = 46;
+        this.widthConfig.push(checkAllWidth);
+
         const sortWidth = 82;
+        if (this.sortable) {
+            this.widthConfig.push(sortWidth);
+        }
+
+        this.fields.forEach(field => {
+            if (field.children) {
+                field.children.forEach(subfield => this.fillWidthConfig(subfield));
+            } else {
+                this.fillWidthConfig(field);
+            }
+        });
+
         let actionWidth = 17;
         this.action = this.action.filter(button => this.security.hasAnyAuthority(button.authority, button.exclusive));
         this.action.forEach((button, index) => {
@@ -136,31 +148,19 @@ export class ListComponent extends BaseComponent implements OnInit {
                 button.divider = false;
             }
         });
-        if (actionWidth === 17) {
-            actionWidth = 94;
+        if (this.action.length > 0) {
+            this.widthConfig.push(actionWidth);
         }
-        this.tableWidthConfig.push(checkAllWidth);
-        this.fields.forEach(field => {
-            if (field.children) {
-                field.children.forEach(subfield => this.fillWidthConfig(subfield));
-            }
-            else {
-                this.fillWidthConfig(field);
-            }
-        });
-        if (this.sortable) {
-            this.tableWidthConfig.push(sortWidth);
-        }
-        this.tableWidthConfig.push(actionWidth);
-        this.tableWidthConfig = this.tableWidthConfig.map(width => width ? width + 'px' : null);
+
+        this.widthConfig = this.widthConfig.map(width => width ? width + 'px' : null);
     }
 
     private fillWidthConfig(field: Field) {
         if (field.list.visible) {
             if (field.list.width) {
-                this.tableWidthConfig.push(field.list.width);
+                this.widthConfig.push(field.list.width);
             } else {
-                this.tableWidthConfig.push(null);
+                this.widthConfig.push(null);
             }
         }
     }

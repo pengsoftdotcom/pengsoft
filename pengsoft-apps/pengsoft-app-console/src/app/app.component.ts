@@ -108,7 +108,6 @@ export class AppComponent {
     primaryRoleChanged(): void {
         this.userDetailsService.setPrimaryRole(this.userDetails.primaryRole, {
             success: (res: any) => {
-                console.log(res);
                 this.security.userDetails = res;
                 this.message
                     .info('设置成功', { nzDuration: 1000 })

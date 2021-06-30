@@ -5,10 +5,11 @@
     </div>
     <div nz-row nzGutter="16" class="table">
         <nz-tree *ngIf="navData" nz-col nzSpan="4" [nzData]="navData" nzBlockNode nzExpandAll
-            [nzVirtualHeight]="tableNavHeight + 'px'" (nzClick)="nav.emit($event)"></nz-tree>
+            [nzVirtualHeight]="navHeight + 'px'" (nzClick)="nav.emit($event)"></nz-tree>
         <div nz-col [nzSpan]="navData ? 20: 24">
-            <nz-table #table nzBordered nzSize="middle" [nzLoading]="loading" [nzWidthConfig]="tableWidthConfig"
-                [nzData]="listData" [nzTitle]="toolbarTemplate" [nzFooter]="footerToolbar ? toolbarTemplate : null"
+            <!-- [nzScroll]="{ y: bodyHeight }" -->
+            <nz-table #table nzBordered nzSize="middle" [nzLoading]="loading" [nzWidthConfig]="widthConfig"
+                [nzData]="listData" [nzTitle]="toolbarTemplate" [nzFooter]="treeable ? toolbarTemplate : null"
                 [nzFrontPagination]="false" [nzShowPagination]="pageable" [(nzPageIndex)]="pageData.page"
                 [(nzPageSize)]="pageData.size" [nzTotal]="pageData.total" [nzShowTotal]="rangeTemplate"
                 nzShowQuickJumper (nzPageIndexChange)="pageChange.emit()" nzShowSizeChanger
@@ -31,7 +32,8 @@
                             nzAlign="center">
                             <a (click)="sequenceChange.emit()">排序</a>
                         </th>
-                        <th nzAlign="center" id="operationColumn" [attr.rowspan]="getRowspan()" colspan="1">
+                        <th *ngIf="action.length > 0" nzAlign="center" id="operationColumn"
+                            [attr.rowspan]="getRowspan()" colspan="1">
                             操作
                         </th>
                     </tr>

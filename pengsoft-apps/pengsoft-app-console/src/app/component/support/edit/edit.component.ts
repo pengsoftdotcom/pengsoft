@@ -59,7 +59,7 @@ export class EditComponent extends BaseComponent implements OnInit {
         const totalHeight = window.innerHeight;
         const titleHeight = 55;
         const toolbarHeight = 65;
-        this.formHeight = totalHeight - titleHeight - toolbarHeight;
+        this.formHeight = totalHeight - titleHeight - toolbarHeight - 1;
     }
 
     show(): void {

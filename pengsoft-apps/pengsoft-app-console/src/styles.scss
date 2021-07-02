@@ -76,3 +76,11 @@
 a.ant-btn {
     padding: 0.1px 0 4px;
 }
+
+.cdk-global-scrollblock {
+    overflow-y: hidden;
+}
+
+.ant-drawer-body {
+    overflow-y: hidden;
+}

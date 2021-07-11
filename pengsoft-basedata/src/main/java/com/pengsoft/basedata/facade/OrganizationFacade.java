@@ -2,7 +2,7 @@ package com.pengsoft.basedata.facade;
 
 import com.pengsoft.basedata.domain.Organization;
 import com.pengsoft.basedata.service.OrganizationService;
-import com.pengsoft.support.facade.TreeEntityFacade;
+import com.pengsoft.support.facade.EntityFacade;
 
 /**
  * The facade interface of {@link Organization}
@@ -11,6 +11,6 @@ import com.pengsoft.support.facade.TreeEntityFacade;
  * @since 1.0.0
  */
 public interface OrganizationFacade
-        extends TreeEntityFacade<OrganizationService, Organization, String>, OrganizationService {
+        extends EntityFacade<OrganizationService, Organization, String>, OrganizationService {
 
 }

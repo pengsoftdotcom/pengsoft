@@ -167,6 +167,7 @@ export class AppComponent {
         this.modal.confirm({
             nzTitle: '确定要退出登录吗？',
             nzOnOk: () => {
+                this.userDetailsService.signOut();
                 this.security.clear();
                 this.signIn();
             },

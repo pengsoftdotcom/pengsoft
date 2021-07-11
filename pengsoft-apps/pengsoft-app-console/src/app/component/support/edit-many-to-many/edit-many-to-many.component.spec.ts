@@ -6,12 +6,12 @@ describe('EditManyToManyComponent', () => {
     let component: EditManyToManyComponent;
     let fixture: ComponentFixture<EditManyToManyComponent>;
 
-    beforeEach(async(() => {
-        TestBed.configureTestingModule({
+    beforeEach(async () => {
+        await TestBed.configureTestingModule({
             declarations: [EditManyToManyComponent]
         })
             .compileComponents();
-    }));
+    });
 
     beforeEach(() => {
         fixture = TestBed.createComponent(EditManyToManyComponent);

@@ -53,7 +53,7 @@ public class StaffFacadeImpl extends EntityFacadeImpl<StaffService, Staff, Strin
                 && SecurityUtils.hasAnyRole(Role.ADMIN, OrganizationFacadeImpl.BASEDATA_ORGANIZATION_ADMIN)) {
             person.setCreatedBy(staff.getOrganization().getCreatedBy());
             staff.setCreatedBy(staff.getOrganization().getCreatedBy());
-            staff.setBelongsTo(staff.getOrganization().getBelongsTo());
+            staff.setBelongsTo(staff.getOrganization().getId());
         }
         staff.setPerson(personService.save(person));
         return super.save(staff);

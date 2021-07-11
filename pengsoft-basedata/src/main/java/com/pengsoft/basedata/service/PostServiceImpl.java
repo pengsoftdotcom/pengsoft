@@ -36,7 +36,7 @@ public class PostServiceImpl extends TreeEntityServiceImpl<PostRepository, Post,
         if (!SecurityUtils.hasAnyRole(OrganizationFacadeImpl.ORGANIZATION_ADMIN)
                 && SecurityUtils.hasAnyRole(Role.ADMIN, OrganizationFacadeImpl.BASEDATA_ORGANIZATION_ADMIN)) {
             post.setCreatedBy(post.getOrganization().getCreatedBy());
-            post.setBelongsTo(post.getOrganization().getBelongsTo());
+            post.setBelongsTo(post.getOrganization().getId());
         }
         return super.save(post);
     }

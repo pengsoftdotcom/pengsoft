@@ -11,6 +11,8 @@ export interface List {
 
     visible?: boolean;
 
+    childrenVisible?: boolean;
+
     align?: 'left' | 'center' | 'right';
 
     label?: string;

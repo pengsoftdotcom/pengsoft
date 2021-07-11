@@ -38,9 +38,9 @@ export class DepartmentComponent extends TreeEntityComponent<DepartmentService> 
     constructor(
         private location: Location,
         private security: SecurityService,
-        protected entity: DepartmentService,
-        protected modal: NzModalService,
-        protected message: NzMessageService
+        public entity: DepartmentService,
+        public modal: NzModalService,
+        public message: NzMessageService
     ) {
         super(entity, modal, message);
         this.organization = this.security.userDetails.organization;
@@ -61,15 +61,6 @@ export class DepartmentComponent extends TreeEntityComponent<DepartmentService> 
         );
     }
 
-    initListToolbar(): void {
-        super.initListToolbar();
-        if (this.allowLoadNavData) {
-            this.listToolbar.splice(1, 0,
-                { name: '切换机构', type: 'link', authority: 'basedata::organization::find_all', action: () => this.switchOrganization() }
-            );
-        }
-    }
-
     initListAction(): void {
         super.initListAction();
         this.listAction.splice(0, 0, {
@@ -82,35 +73,9 @@ export class DepartmentComponent extends TreeEntityComponent<DepartmentService> 
     }
 
     afterInit(): void {
-        if (this.organization) {
-            this.filterForm = { 'organization.id': this.organization.id };
-            this.editForm = { organization: this.organization };
-            super.afterInit();
-        } else {
-            this.switchOrganization();
-        }
-    }
-
-    switchOrganization(): void {
-        this.modal.create({
-            nzTitle: '切换机构',
-            nzContent: SwitchOrganizationComponent,
-            nzOnOk: component => {
-                this.organization = component.form.organization;
-                this.title = this.organization.name;
-                this.afterInit();
-            },
-            nzOnCancel: () => {
-                if (!this.organization) {
-                    this.modal.confirm({
-                        nzTitle: '确认',
-                        nzContent: '如不选择机构，将退回到最近一次打开页面',
-                        nzOnOk: () => this.location.back()
-                    });
-                    return false;
-                }
-            }
-        });
+        this.filterForm = { 'organization.id': this.organization.id };
+        this.editForm = { organization: this.organization };
+        super.afterInit();
     }
 
     editJobs(department: any): void {

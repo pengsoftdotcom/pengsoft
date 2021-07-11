@@ -6,12 +6,12 @@ describe('RoleComponent', () => {
     let component: RoleComponent;
     let fixture: ComponentFixture<RoleComponent>;
 
-    beforeEach(async(() => {
-        TestBed.configureTestingModule({
+    beforeEach(async () => {
+        await TestBed.configureTestingModule({
             declarations: [RoleComponent]
         })
             .compileComponents();
-    }));
+    });
 
     beforeEach(() => {
         fixture = TestBed.createComponent(RoleComponent);

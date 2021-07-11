@@ -12,6 +12,8 @@ export interface Edit {
 
     visible?: boolean | ((form: any, edit: Edit) => boolean);
 
+    childrenVisible?: boolean | ((form: any, edit: Edit) => boolean);
+
     label?: Label;
 
     input?: Input;

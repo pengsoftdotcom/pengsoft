@@ -2,9 +2,7 @@ package com.pengsoft.basedata.facade;
 
 import javax.inject.Inject;
 
-import com.pengsoft.basedata.domain.Organization;
-import com.pengsoft.basedata.domain.Person;
-import com.pengsoft.system.service.DictionaryItemService;
+import com.pengsoft.basedata.service.PersonService;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,20 +17,16 @@ public class OrganizationFacadeTest {
     private OrganizationFacade facade;
 
     @Inject
-    private DictionaryItemService service;
+    private PersonService service;
 
     @Test
     @WithUserDetails("admin")
     void save() {
-        var organization = new Organization();
-        organization.setCode("001");
-        organization.setName("重庆鹏软科技有限公司");
-        service.findOne("98fdc3e6-567c-48b6-9c82-ffe7f20b6717").ifPresent(organization::setCategory);
-        var admin = new Person();
-        admin.setName("党鹏");
-        admin.setMobile("18508101366");
-        organization.setAdmin(admin);
-        facade.save(organization);
+        facade.findOneByCode("001")
+                .ifPresent(organization -> service.findOneByMobile("18508101366").ifPresent(admin -> {
+                    organization.setAdmin(admin);
+                    facade.save(organization);
+                }));
     }
 
     @Test

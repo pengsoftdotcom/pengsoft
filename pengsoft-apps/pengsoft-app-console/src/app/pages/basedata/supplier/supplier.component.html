@@ -1,0 +1,5 @@
+<app-list #listComponent [title]="(title ? title : '') + '供应商列表'" [fields]="fields" [listData]="listData"
+    [pageData]="pageData" [toolbar]="listToolbar" [action]="listAction" (pageChange)="list()"></app-list>
+<app-edit-supplier #editComponent [title]="(title ? title : '') + '供应商编辑'" [fields]="fields" [form]="editForm"
+    [toolbar]="editToolbar" [errors]="errors">
+</app-edit-supplier>

@@ -25,9 +25,9 @@ export class CaptchaComponent extends EntityComponent<CaptchaService> {
     getEditComponent(): EditComponent { return this.editComponent }
 
     constructor(
-        protected entity: CaptchaService,
-        protected modal: NzModalService,
-        protected message: NzMessageService
+        public entity: CaptchaService,
+        public modal: NzModalService,
+        public message: NzMessageService
     ) {
         super(entity, modal, message);
     }

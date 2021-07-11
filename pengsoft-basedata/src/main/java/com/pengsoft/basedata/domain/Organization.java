@@ -15,6 +15,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.pengsoft.security.domain.OwnedEntity;
 import com.pengsoft.support.domain.Codeable;
 import com.pengsoft.system.domain.DictionaryItem;
 
@@ -39,7 +40,7 @@ import lombok.Setter;
 @Table(name = "t_organization", indexes = { @Index(name = "i_organization_code", columnList = "code", unique = true),
         @Index(name = "i_organization_name", columnList = "name", unique = true),
         @Index(name = "i_organization_short_name", columnList = "shortName") })
-public class Organization extends OwnedExtTreeEntity<Organization> implements Codeable {
+public class Organization extends OwnedEntity implements Codeable {
 
     private static final long serialVersionUID = -8823819150888810983L;
 
@@ -60,10 +61,9 @@ public class Organization extends OwnedExtTreeEntity<Organization> implements Co
     private DictionaryItem category;
 
     @Valid
-    @NotNull
     @ManyToOne
     @NotFound(action = NotFoundAction.IGNORE)
-    private Person admin = new Person();
+    private Person admin;
 
     @JsonIgnore
     @OneToMany(mappedBy = "organization", cascade = CascadeType.REMOVE)
@@ -76,5 +76,17 @@ public class Organization extends OwnedExtTreeEntity<Organization> implements Co
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     @NotFound(action = NotFoundAction.IGNORE)
     private List<Department> departments = new ArrayList<>();
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "supplier", cascade = CascadeType.REMOVE)
+    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+    @NotFound(action = NotFoundAction.IGNORE)
+    private List<SupplierConsumer> suppliers = new ArrayList<>();
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "consumer", cascade = CascadeType.REMOVE)
+    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+    @NotFound(action = NotFoundAction.IGNORE)
+    private List<SupplierConsumer> consumers = new ArrayList<>();
 
 }

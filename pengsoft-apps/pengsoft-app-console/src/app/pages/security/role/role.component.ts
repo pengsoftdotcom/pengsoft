@@ -50,9 +50,9 @@ export class RoleComponent extends TreeEntityComponent<RoleService> {
 
     constructor(
         private authority: AuthorityService,
-        protected entity: RoleService,
-        protected modal: NzModalService,
-        protected message: NzMessageService
+        public entity: RoleService,
+        public modal: NzModalService,
+        public message: NzMessageService
     ) {
         super(entity, modal, message);
     }

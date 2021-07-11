@@ -3,7 +3,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalService } from 'ng-zorro-antd/modal';
-import { NzFormatEmitEvent, NzTreeNodeOptions } from 'ng-zorro-antd/tree';
+import { NzFormatEmitEvent } from 'ng-zorro-antd/tree';
 import { ResetPasswordComponent } from 'src/app/component/modal/reset-password/reset-password.component';
 import { SwitchOrganizationComponent } from 'src/app/component/modal/switch-organization/switch-organization.component';
 import { EditComponent } from 'src/app/component/support/edit/edit.component';
@@ -48,9 +48,9 @@ export class StaffComponent extends EntityComponent<StaffService> implements OnI
         private job: JobService,
         private departmentService: DepartmentService,
         private security: SecurityService,
-        protected entity: StaffService,
-        protected modal: NzModalService,
-        protected message: NzMessageService
+        public entity: StaffService,
+        public modal: NzModalService,
+        public message: NzMessageService
     ) {
         super(entity, modal, message);
         this.allowLoadNavData = true;
@@ -92,8 +92,8 @@ export class StaffComponent extends EntityComponent<StaffService> implements OnI
 
     initListToolbar(): void {
         super.initListToolbar();
-        if (this.allowLoadNavData) {
-            this.listToolbar.splice(1, 0, {
+        if (!this.security.userDetails.organization) {
+            this.listToolbar.splice(2, 0, {
                 name: '切换机构',
                 type: 'link',
                 authority: 'basedata::organization::find_all',
@@ -111,6 +111,11 @@ export class StaffComponent extends EntityComponent<StaffService> implements OnI
             authority: 'security::user::reset_password',
             action: (row: any) => this.resetPassword(row)
         });
+        this.listToolbar.forEach(button => {
+            if (button.name === '新增') {
+                button.disabled = () => !this.organization;
+            }
+        })
     }
 
     afterInit(): void {
@@ -133,16 +138,6 @@ export class StaffComponent extends EntityComponent<StaffService> implements OnI
                 this.organization = component.form.organization;
                 this.title = this.organization.name;
                 this.afterInit();
-            },
-            nzOnCancel: () => {
-                if (!this.organization) {
-                    this.modal.confirm({
-                        nzTitle: '确认',
-                        nzContent: '如不选择机构，将退回到最近一次打开页面',
-                        nzOnOk: () => this.location.back()
-                    });
-                    return false;
-                }
             }
         });
     }
@@ -173,11 +168,6 @@ export class StaffComponent extends EntityComponent<StaffService> implements OnI
             this.filterForm['department.id'] = this.department.id;
         }
         this.list();
-    }
-
-    beforeEdit(): void {
-        super.beforeEdit();
-        this.editForm.person = {};
     }
 
     afterEdit(): void {

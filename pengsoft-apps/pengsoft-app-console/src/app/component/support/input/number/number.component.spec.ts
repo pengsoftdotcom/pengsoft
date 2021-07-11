@@ -6,12 +6,12 @@ describe('NumberComponent', () => {
     let component: NumberComponent;
     let fixture: ComponentFixture<NumberComponent>;
 
-    beforeEach(async(() => {
-        TestBed.configureTestingModule({
+    beforeEach(async () => {
+        await TestBed.configureTestingModule({
             declarations: [NumberComponent]
         })
             .compileComponents();
-    }));
+    });
 
     beforeEach(() => {
         fixture = TestBed.createComponent(NumberComponent);

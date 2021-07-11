@@ -1,0 +1,22 @@
+<ng-template #content>
+    <nz-spin [nzSpinning]="loading">
+        <div class="edit">
+            <form nz-form [style.height]="formHeight + 'px'">
+                <div nz-row [nzGutter]="24">
+                    <div nz-col [nzSpan]="span" *ngFor="let field of consumerFields">
+                        <app-form-item [form]="form.consumer" [field]="field" [errors]="errors"></app-form-item>
+                    </div>
+                </div>
+            </form>
+            <div class="toolbar">
+                <nz-space>
+                    <ng-container *ngFor="let button of toolbar">
+                        <app-button *nzSpaceItem [title]="button.exclusive" [hasAnyAuthority]="button.authority"
+                            [name]="button.name" [type]="button.type" [danger]="button.danger"
+                            [divider]="button.divider" [size]="button.size" (action)="button.action()"></app-button>
+                    </ng-container>
+                </nz-space>
+            </div>
+        </div>
+    </nz-spin>
+</ng-template>

@@ -5,11 +5,13 @@ import javax.inject.Inject;
 import com.pengsoft.security.annotation.AuthorityChanged;
 import com.pengsoft.security.annotation.Authorized;
 import com.pengsoft.security.domain.Role;
+import com.pengsoft.security.domain.User;
 import com.pengsoft.security.service.DefaultUserDetailsService;
 import com.pengsoft.security.service.UserService;
 import com.pengsoft.security.util.SecurityUtils;
 import com.pengsoft.support.exception.Exceptions;
 
+import org.springframework.security.core.annotation.CurrentSecurityContext;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -55,8 +57,14 @@ public class UserDetailsApi {
 
     @PostMapping("reset-password")
     public void resetPassword(final String username, final String password) {
-        var user = userService.findOneByMobile(username).orElseThrow(() -> exceptions.entityNotFound(username));
+        var user = userService.findOneByMobile(username).orElseThrow(() -> exceptions.entityNotExists(username));
         userService.resetPassword(user.getId(), password);
+    }
+
+    @AuthorityChanged
+    @PostMapping("sign-out")
+    public void signOut(@CurrentSecurityContext(expression = "authentication.principal.user") User user) {
+
     }
 
 }

@@ -40,7 +40,7 @@ public class TreeEntityServiceImpl<R extends TreeEntityRepository<?, T, ID>, T e
         if (entity.getParent() != null) {
             // set the current parent as a non-leaf node.
             entity.setParent(findOne(entity.getParent().getId())
-                    .orElseThrow(() -> getExceptions().entityNotFound(entity.getParent().getId().toString())));
+                    .orElseThrow(() -> getExceptions().entityNotExists(entity.getParent().getId().toString())));
             entity.getParent().setLeaf(false);
             super.save(entity.getParent());
 

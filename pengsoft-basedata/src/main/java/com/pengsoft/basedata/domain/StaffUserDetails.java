@@ -30,9 +30,6 @@ public class StaffUserDetails extends PersonUserDetails {
     private Collection<Job> jobs;
 
     @JsonSerialize(using = JobJsonSerializer.class)
-    private Job currentJob;
-
-    @JsonSerialize(using = JobJsonSerializer.class)
     private Job primaryJob;
 
     @JsonSerialize(using = DepartmentJsonSerializer.class)
@@ -43,7 +40,6 @@ public class StaffUserDetails extends PersonUserDetails {
         super(staff.getPerson(), organizations, roles, null, authorities);
         setJobs(jobs);
         setPrimaryJob(staff.getJob());
-        setCurrentJob(staff.getJob());
         setDepartment(staff.getDepartment());
         setOrganization(staff.getOrganization());
     }

@@ -3,7 +3,7 @@ import { NzTreeNodeOptions } from "ng-zorro-antd/tree";
 
 export interface Option extends NzTreeNodeOptions {
     label: string;
-    value: string;
+    value: any;
     disabled?: boolean;
     hide?: boolean;
     customContent?: boolean;

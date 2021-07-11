@@ -41,7 +41,7 @@ public class DepartmentServiceImpl extends TreeEntityServiceImpl<DepartmentRepos
         if (!SecurityUtils.hasAnyRole(OrganizationFacadeImpl.ORGANIZATION_ADMIN)
                 && SecurityUtils.hasAnyRole(Role.ADMIN, OrganizationFacadeImpl.BASEDATA_ORGANIZATION_ADMIN)) {
             department.setCreatedBy(department.getOrganization().getCreatedBy());
-            department.setBelongsTo(department.getOrganization().getBelongsTo());
+            department.setBelongsTo(department.getOrganization().getId());
         }
         return super.save(department);
     }

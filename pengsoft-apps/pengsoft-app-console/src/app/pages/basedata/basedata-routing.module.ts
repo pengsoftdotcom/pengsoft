@@ -1,11 +1,13 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { ConsumerComponent } from './consumer/consumer.component';
 import { DepartmentComponent } from './department/department.component';
 import { JobComponent } from './job/job.component';
 import { OrganizationComponent } from './organization/organization.component';
 import { PersonComponent } from './person/person.component';
 import { PostComponent } from './post/post.component';
 import { StaffComponent } from './staff/staff.component';
+import { SupplierComponent } from './supplier/supplier.component';
 
 
 
@@ -14,6 +16,8 @@ const routes: Routes = [
         path: 'basedata',
         data: { name: '基础数据', icon: 'book' },
         children: [
+            { path: 'supplier', component: SupplierComponent, data: { code: 'basedata::supplier_consumer::find_all', name: '供应商' } },
+            { path: 'consumer', component: ConsumerComponent, data: { code: 'basedata::supplier_consumer::find_all', name: '客户' } },
             { path: 'organization', component: OrganizationComponent, data: { code: 'basedata::organization::find_all', name: '机构' } },
             { path: 'department', component: DepartmentComponent, data: { code: 'basedata::department::find_all', name: '部门', exclusive: 'basedata::organization::find_all' } },
             { path: 'post', component: PostComponent, data: { code: 'basedata::post::find_all', name: '职务', exclusive: 'basedata::organization::find_all' } },

@@ -23,9 +23,9 @@ export class AuthorityComponent extends EntityComponent<AuthorityService> {
     getEditComponent(): EditComponent { return this.editComponent }
 
     constructor(
-        protected entity: AuthorityService,
-        protected modal: NzModalService,
-        protected message: NzMessageService
+        public entity: AuthorityService,
+        public modal: NzModalService,
+        public message: NzMessageService
     ) {
         super(entity, modal, message);
     }

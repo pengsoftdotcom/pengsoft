@@ -1,6 +1,6 @@
-import { Component, OnInit, OnChanges, SimpleChanges } from '@angular/core';
-import { InputComponent } from '../input.component';
+import { Component, OnChanges, SimpleChanges } from '@angular/core';
 import { DateUtils } from 'src/app/util/date-utils';
+import { InputComponent } from '../input.component';
 
 @Component({
     selector: 'app-input-date',

@@ -23,9 +23,9 @@ export class RegionComponent extends TreeEntityComponent<RegionService> {
     getEditComponent(): EditComponent { return this.editComponent }
 
     constructor(
-        protected entity: RegionService,
-        protected modal: NzModalService,
-        protected message: NzMessageService
+        public entity: RegionService,
+        public modal: NzModalService,
+        public message: NzMessageService
     ) {
         super(entity, modal, message);
     }

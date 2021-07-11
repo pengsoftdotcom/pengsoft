@@ -30,13 +30,6 @@ public class SecurityUtilsExt {
     }
 
     /**
-     * Returns current user's current job.
-     */
-    public static Job getCurrentJob() {
-        return SecurityUtils.get("currentJob", Job.class);
-    }
-
-    /**
      * Returns current user's primary job.
      */
     public static Job getPrimaryJob() {
@@ -75,7 +68,7 @@ public class SecurityUtilsExt {
         if (SecurityUtils.hasAnyRole(roleCodes)) {
             return true;
         } else {
-            return getCurrentJob().getJobRoles().stream().map(JobRole::getRole)
+            return getPrimaryJob().getJobRoles().stream().map(JobRole::getRole)
                     .anyMatch(role -> Arrays.stream(roleCodes).anyMatch(roleCode -> roleCode.equals(role.getCode())));
         }
     }

@@ -100,7 +100,7 @@ public class DefaultAuthorizationServerConfigurer extends AuthorizationServerCon
     }
 
     @EventListener
-    public void authenticationFailedEventListener(final AbstractAuthenticationFailureEvent event) {
+    public void authenticationFailureEventListener(final AbstractAuthenticationFailureEvent event) {
         final var exception = event.getException();
         final var authentication = event.getAuthentication();
         if (exception instanceof BadCredentialsException) {

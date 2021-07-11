@@ -29,9 +29,9 @@ export class PersonComponent extends EntityComponent<PersonService> {
 
     constructor(
         public dictionaryItem: DictionaryItemService,
-        protected entity: PersonService,
-        protected modal: NzModalService,
-        protected message: NzMessageService
+        public entity: PersonService,
+        public modal: NzModalService,
+        public message: NzMessageService
     ) {
         super(entity, modal, message);
     }

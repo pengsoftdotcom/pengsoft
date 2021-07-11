@@ -27,9 +27,9 @@ export class DictionaryTypeComponent extends EntityComponent<DictionaryTypeServi
     @ViewChild('itemsComponent', { static: true }) itemsComponent: EditOneToManyComponent;
 
     constructor(
-        protected entity: DictionaryTypeService,
-        protected modal: NzModalService,
-        protected message: NzMessageService
+        public entity: DictionaryTypeService,
+        public modal: NzModalService,
+        public message: NzMessageService
     ) {
         super(entity, modal, message);
     }

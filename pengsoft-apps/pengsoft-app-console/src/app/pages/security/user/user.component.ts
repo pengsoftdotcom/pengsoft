@@ -54,9 +54,9 @@ export class UserComponent extends EntityComponent<UserService> {
 
     constructor(
         private role: RoleService,
-        protected entity: UserService,
-        protected modal: NzModalService,
-        protected message: NzMessageService
+        public entity: UserService,
+        public modal: NzModalService,
+        public message: NzMessageService
     ) {
         super(entity, modal, message);
     }

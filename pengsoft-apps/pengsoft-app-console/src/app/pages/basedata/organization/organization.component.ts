@@ -1,26 +1,29 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { NzDrawerRef, NzDrawerService } from 'ng-zorro-antd/drawer';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { EditOneToManyComponent } from 'src/app/component/support/edit-one-to-many/edit-one-to-many.component';
 import { EditComponent } from 'src/app/component/support/edit/edit.component';
+import { EntityComponent } from 'src/app/component/support/entity.component';
 import { Option } from 'src/app/component/support/form-item/option';
 import { InputComponent } from 'src/app/component/support/input/input.component';
 import { ListComponent } from 'src/app/component/support/list/list.component';
-import { TreeEntityComponent } from 'src/app/component/support/tree-entity.component';
 import { DictionaryItemService } from 'src/app/service/basedata/dictionary-item.service';
 import { OrganizationService } from 'src/app/service/basedata/organization.service';
+import { PersonService } from 'src/app/service/basedata/person.service';
 import { EntityUtils } from 'src/app/util/entity-utils';
 import { FieldUtils } from 'src/app/util/field-utils';
 import { DepartmentComponent } from '../department/department.component';
 import { PersonComponent } from '../person/person.component';
 import { PostComponent } from '../post/post.component';
+import { SelectAdminComponent } from './select-admin.component';
 
 @Component({
     selector: 'app-organization',
     templateUrl: './organization.component.html',
     styleUrls: ['./organization.component.scss']
 })
-export class OrganizationComponent extends TreeEntityComponent<OrganizationService> implements OnInit {
+export class OrganizationComponent extends EntityComponent<OrganizationService> implements OnInit {
 
     @ViewChild('listComponent', { static: true }) listComponent: ListComponent;
 
@@ -30,24 +33,37 @@ export class OrganizationComponent extends TreeEntityComponent<OrganizationServi
 
     getEditComponent(): EditComponent { return this.editComponent }
 
+    @ViewChild('editAdminComponent', { static: true }) editAdminComponent: EditComponent;
+
+    editAdminToolbar = [];
+
     @ViewChild('departmentsComponent', { static: true }) departmentsComponent: EditOneToManyComponent;
 
     @ViewChild('postsComponent', { static: true }) postsComponent: EditOneToManyComponent;
 
+    drawerRef: NzDrawerRef;
+
     constructor(
-        private dictionaryItem: DictionaryItemService,
-        protected entity: OrganizationService,
-        protected modal: NzModalService,
-        protected message: NzMessageService
+        public dictionaryItem: DictionaryItemService,
+        public person: PersonService,
+        public entity: OrganizationService,
+        public modal: NzModalService,
+        public message: NzMessageService,
+        public drawer: NzDrawerService
     ) {
         super(entity, modal, message);
     }
 
+    ngOnInit(): void {
+        super.ngOnInit();
+        this.initEditAdminAction();
+    }
+
     initFields(): void {
-        super.initFields();
         PersonComponent.prototype.dictionaryItem = this.dictionaryItem;
         PersonComponent.prototype.initFields();
-        PersonComponent.prototype.fields.forEach(field => {
+        const personFields = PersonComponent.prototype.fields;
+        personFields.forEach(field => {
             switch (field.code) {
                 case 'nickname':
                 case 'gender':
@@ -56,7 +72,7 @@ export class OrganizationComponent extends TreeEntityComponent<OrganizationServi
                 default: break;
             }
         });
-        this.fields.splice(1, 0,
+        this.fields = [
             FieldUtils.buildTextForCode({ width: 300 }),
             FieldUtils.buildTextForName(),
             FieldUtils.buildText({ code: 'shortName', name: '简称' }),
@@ -77,13 +93,16 @@ export class OrganizationComponent extends TreeEntityComponent<OrganizationServi
                 },
                 filter: {}
             }),
-            FieldUtils.buildText({ code: 'admin', name: '管理员', children: PersonComponent.prototype.fields })
-        );
+            FieldUtils.buildText({ code: 'admin', name: '管理员', children: personFields, edit: { visible: false } })
+        ];
     }
 
     initListAction(): void {
         super.initListAction();
         this.listAction.splice(0, 0, {
+            name: '设置管理员', type: 'link', width: 72, authority: 'basedata::organization::find_one',
+            action: (row: any) => this.editAdmin(row)
+        }, {
             name: '部门', type: 'link', width: 30, authority: 'basedata::department::find_all',
             action: (row: any) => this.editDepartments(row)
         }, {
@@ -92,9 +111,67 @@ export class OrganizationComponent extends TreeEntityComponent<OrganizationServi
         });
     }
 
-    beforeEdit(): void {
-        super.beforeEdit();
-        this.editForm.admin = {};
+    initEditAdminAction(): void {
+        this.editAdminToolbar = [
+            { name: '保存', type: 'primary', size: 'default', action: () => this.saveAdmin(), authority: this.getAuthority('save') },
+            { name: '选择', type: 'default', size: 'default', action: (row: any) => this.showSelectAdmin(), authority: 'basedata::person::find_page' },
+            { name: '删除', type: 'primary', size: 'default', danger: true, action: () => this.deleteAdmin(), authority: this.getAuthority('save') }
+        ];
+    }
+
+    saveAdmin(): void {
+        const form = this.buildForm();
+        this.entity.save(form, {
+            errors: this.errors,
+            before: () => this.editAdminComponent.loading = true,
+            success: (res: any) => {
+                this.message.info('保存成功');
+                this.editAdminComponent.hide();
+                if (this.drawerRef) {
+                    this.hideSelectAdmin();
+                }
+                this.list();
+            },
+            after: () => this.editAdminComponent.loading = false
+        });
+    }
+
+    showSelectAdmin(): void {
+        this.editAdminComponent.hide();
+        this.drawerRef = this.drawer.create({
+            nzBodyStyle: { padding: '16px' },
+            nzWidth: '30%',
+            nzTitle: '选择管理员',
+            nzContent: SelectAdminComponent,
+            nzContentParams: { editForm: this.editForm, organizationComponent: this }
+        });
+    }
+
+    hideSelectAdmin(): void {
+        this.drawerRef.close();
+    }
+
+    deleteAdmin(): void {
+        const form = this.buildForm();
+        form.admin = null;
+        this.entity.save(form, {
+            errors: this.errors,
+            before: () => this.editAdminComponent.loading = true,
+            success: (res: any) => {
+                this.message.info('删除成功');
+                this.editAdminComponent.hide();
+                this.list();
+            },
+            after: () => this.editAdminComponent.loading = false
+        });
+    }
+
+    editAdmin(organization: any): void {
+        this.editForm = organization;
+        if (!this.editForm.admin) {
+            this.editForm.admin = {};
+        }
+        this.editAdminComponent.show();
     }
 
     editDepartments(organization: any): void {

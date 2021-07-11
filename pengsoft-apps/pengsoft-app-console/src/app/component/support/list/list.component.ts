@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
+import { deepCopy } from 'deep-copy-ts';
 import { NzTreeNodeOptions } from 'ng-zorro-antd/tree';
 import { SecurityService } from 'src/app/service/support/security.service';
 import { BaseComponent } from '../base.component';
@@ -16,6 +17,8 @@ import { Sort } from './sort';
 export class ListComponent extends BaseComponent implements OnInit {
 
     @Input() title = '';
+
+    @Input() checkbox = true;
 
     @Input() fields: Array<Field> = [];
 
@@ -61,9 +64,11 @@ export class ListComponent extends BaseComponent implements OnInit {
 
     groupable = false;
 
-    firstVisibleFieldIndex = -1;
+    depth = 0;
 
-    // isWindows = false;
+    fieldsArray = [];
+
+    firstVisibleFieldIndex = -1;
 
     constructor(private security: SecurityService, public sanitizer: DomSanitizer) {
         super();
@@ -71,7 +76,6 @@ export class ListComponent extends BaseComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        // this.isWindows = window.navigator.userAgent.indexOf('Windows') > -1;
         this.initVisibleFields();
         this.initGroupable();
         this.initTreeable();
@@ -81,17 +85,31 @@ export class ListComponent extends BaseComponent implements OnInit {
     }
 
     private initVisibleFields() {
-        this.fields.filter(field => field.list.visible).forEach(field => {
+        let fields = deepCopy<Array<Field>>(this.fields);
+        while (fields.length > 0) {
+            this.depth++;
+            if (fields.filter(field => field.list.visible).length > 0) {
+                this.fieldsArray.push(fields);
+            }
+            let subFields = [];
+            fields.filter(field => field.children).forEach(field => field.children.forEach(subField => subFields.push(subField)));
+            fields = subFields;
+        }
+
+        const queue = [];
+        this.fields.forEach(field => queue.push(field));
+        while (queue.length > 0) {
+            const field = queue.shift();
             if (field.children) {
-                field.children.filter(subfield => subfield.list.visible).forEach(subfield => this.visibleFields.push(subfield));
-            } else {
+                field.children.forEach((subField: any) => queue.push(subField));
+            } else if (field.list.visible) {
                 this.visibleFields.push(field);
             }
-        });
+        }
     }
 
     private initGroupable() {
-        this.groupable = this.fields.some(field => field.children);
+        this.groupable = this.fields.some(field => field.list.childrenVisible && field.children);
     }
 
     private initTreeable() {
@@ -121,17 +139,19 @@ export class ListComponent extends BaseComponent implements OnInit {
     }
 
     private initWidthConfig() {
-        const checkAllWidth = 46;
-        this.widthConfig.push(checkAllWidth);
+        if (this.checkbox) {
+            const checkAllWidth = 46;
+            this.widthConfig.push(checkAllWidth);
+        }
 
         const sortWidth = 82;
         if (this.sortable) {
             this.widthConfig.push(sortWidth);
         }
 
-        this.fields.forEach(field => {
+        this.visibleFields.forEach(field => {
             if (field.children) {
-                field.children.forEach(subfield => this.fillWidthConfig(subfield));
+                field.children.forEach((subField: Field) => this.fillWidthConfig(subField));
             } else {
                 this.fillWidthConfig(field);
             }
@@ -151,7 +171,6 @@ export class ListComponent extends BaseComponent implements OnInit {
         if (this.action.length > 0) {
             this.widthConfig.push(actionWidth);
         }
-
         this.widthConfig = this.widthConfig.map(width => width ? width + 'px' : null);
     }
 
@@ -189,7 +208,7 @@ export class ListComponent extends BaseComponent implements OnInit {
         this.indeterminate = !this.allChecked && !this.listData.every(d => !d.checked);
     }
 
-    isRowVisible(row: any): boolean {
+    isVisible(row: any): boolean {
         if (this.treeable) {
             const parents = this.listData.filter((data, i) => row.id !== data.id && row.parentIds.indexOf(data.id) > -1);
             if (parents.length > 0) {
@@ -199,17 +218,29 @@ export class ListComponent extends BaseComponent implements OnInit {
         return true;
     }
 
-    getRowspan(field?: Field): number {
-        if (this.groupable && (!field || !field.children)) {
-            return 2;
-        } else {
-            return 1;
+    getRowspan(field?: Field, index?: number): number {
+        let rowspan = 1;
+        if (!field) {
+            rowspan = this.fieldsArray.length;
+        } else if (!field.children) {
+            rowspan = this.fieldsArray.length - index;
         }
+        return rowspan;
     }
 
     getColspan(field: Field): number {
         if (field.children) {
-            return field.children.filter(subfield => subfield.list.visible).length;
+            let length = 0;
+            const queue = [field];
+            while (queue.length > 0) {
+                const f = queue.shift();
+                if (f.children) {
+                    f.children.forEach(subField => queue.push(subField))
+                } else if (f.list.visible) {
+                    length++;
+                }
+            }
+            return length;
         } else {
             return 1;
         }
@@ -218,15 +249,17 @@ export class ListComponent extends BaseComponent implements OnInit {
     render(field: Field, row: any): any {
         const list = field.list;
         let value: any;
+        value = row;
         if (field.parentCode) {
-            value = row[field.parentCode];
-        } else {
-            value = row;
+            const codes = field.parentCode.split('.');
+            for (const code of codes) {
+                value = value[code];
+            }
         }
         if (list.render) {
             value = list.render(field, value, this.sanitizer);
         } else {
-            value = value ? value[list.code] : null;
+            value = value !== undefined && value !== null ? value[list.code] : null;
         }
         if (value === undefined || value === null) {
             return '-';
@@ -236,7 +269,8 @@ export class ListComponent extends BaseComponent implements OnInit {
     }
 
     sortChange(field: Field, direction: string): void {
-        const sort: Sort = { code: field.code, direction: null, priority: field.list.sortPriority };
+        const code = field.parentCode ? field.parentCode + '.' + field.code : field.code;
+        const sort: Sort = { code, direction: null, priority: field.list.sortPriority };
         switch (direction) {
             case 'ascend':
                 sort.direction = 'asc';
@@ -248,7 +282,7 @@ export class ListComponent extends BaseComponent implements OnInit {
                 sort.direction = null;
                 break;
         }
-        const index = this.pageData.sort.findIndex(value => value.code === field.code);
+        const index = this.pageData.sort.findIndex(value => value.code === code);
         if (index > -1) {
             this.pageData.sort.splice(index, 1);
         }
@@ -267,11 +301,15 @@ export class ListComponent extends BaseComponent implements OnInit {
         this.pageChange.emit();
     }
 
-    isButtonDisabled(button: Button, row?: any): boolean {
+    isDisabled(button: Button, row?: any): boolean {
         if (button.disabled) {
             return button.disabled(row);
         }
         return false;
+    }
+
+    counter(i: number) {
+        return new Array(i);
     }
 
 }

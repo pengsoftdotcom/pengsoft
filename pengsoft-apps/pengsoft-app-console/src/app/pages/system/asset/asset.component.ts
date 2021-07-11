@@ -25,9 +25,9 @@ export class AssetComponent extends EntityComponent<AssetService> {
     @ViewChild('content', { static: true }) content: TemplateRef<any>;
 
     constructor(
-        protected entity: AssetService,
-        protected modal: NzModalService,
-        protected message: NzMessageService) {
+        public entity: AssetService,
+        public modal: NzModalService,
+        public message: NzMessageService) {
         super(entity, modal, message);
     }
 
@@ -77,7 +77,7 @@ export class AssetComponent extends EntityComponent<AssetService> {
         this.listAction[0].name = '查看';
     }
 
-    intEditToolbar(): void {
+    initEditToolbar(): void {
         this.editToolbar = [];
     }
 

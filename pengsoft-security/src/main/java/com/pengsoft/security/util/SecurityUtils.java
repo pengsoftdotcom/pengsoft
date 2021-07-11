@@ -14,8 +14,6 @@ import com.pengsoft.support.util.StringUtils;
 
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -38,11 +36,11 @@ public class SecurityUtils {
      * Returns {@link UserDetails}
      */
     public static DefaultUserDetails getUserDetails() {
-        final SecurityContext context = SecurityContextHolder.getContext();
+        final var context = SecurityContextHolder.getContext();
         if (context != null) {
-            final Authentication authentication = context.getAuthentication();
+            final var authentication = context.getAuthentication();
             if (authentication != null) {
-                final Object principal = authentication.getPrincipal();
+                final var principal = authentication.getPrincipal();
                 if (principal instanceof DefaultUserDetails) {
                     return (DefaultUserDetails) principal;
                 } else {

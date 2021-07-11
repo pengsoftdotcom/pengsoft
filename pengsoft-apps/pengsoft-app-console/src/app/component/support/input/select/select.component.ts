@@ -1,7 +1,6 @@
-import { Component, OnChanges, SimpleChanges, OnInit } from '@angular/core';
+import { Component, OnChanges, SimpleChanges } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { EntityUtils } from 'src/app/util/entity-utils';
-import { Option } from '../../form-item/option';
 import { InputComponent } from '../input.component';
 
 @Component({

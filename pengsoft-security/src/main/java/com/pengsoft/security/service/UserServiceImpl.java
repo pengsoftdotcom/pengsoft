@@ -86,30 +86,31 @@ public class UserServiceImpl extends EntityServiceImpl<UserRepository, User, Str
     @Override
     public void resetPassword(final String id, final String password) {
         if (findOne(id).isEmpty()) {
-            throw getExceptions().entityNotFound(id);
+            throw getExceptions().entityNotExists(id);
         }
         getRepository().resetPassword(id, passwordEncoder.encode(password));
     }
 
     @Override
-    public void grantRoles(final User user, final List<Role> roles) {
-        final var source = user.getUserRoles();
-        final var target = roles.stream().map(role -> new UserRole(user, role)).collect(Collectors.toList());
-        final var deleted = source.stream()
-                .filter(s -> target.stream().noneMatch(
+    public void grantRoles(User target, final List<Role> roles) {
+        final var source = findOne(target.getId()).orElseThrow(() -> getExceptions().entityNotExists(target.getId()));
+        final var sourceRoles = source.getUserRoles();
+        final var targetRoles = roles.stream().map(role -> new UserRole(target, role)).collect(Collectors.toList());
+        final var deletedRoles = sourceRoles.stream()
+                .filter(s -> targetRoles.stream().noneMatch(
                         t -> EntityUtils.eq(s.getUser(), t.getUser()) && EntityUtils.eq(s.getRole(), t.getRole())))
                 .collect(Collectors.toList());
-        userRoleRepository.deleteAll(deleted);
-        source.removeAll(deleted);
-        final var created = target.stream()
-                .filter(t -> source.stream().noneMatch(
+        userRoleRepository.deleteAll(deletedRoles);
+        sourceRoles.removeAll(deletedRoles);
+        final var createdRoles = targetRoles.stream()
+                .filter(t -> sourceRoles.stream().noneMatch(
                         s -> EntityUtils.eq(t.getUser(), s.getUser()) && EntityUtils.eq(t.getRole(), s.getRole())))
                 .collect(Collectors.toList());
-        userRoleRepository.saveAll(created);
-        source.addAll(created);
-        super.save(user);
-        if (!source.isEmpty() && source.stream().noneMatch(UserRole::isPrimary)) {
-            setPrimaryRole(user, source.get(0).getRole());
+        userRoleRepository.saveAll(createdRoles);
+        sourceRoles.addAll(createdRoles);
+        super.save(target);
+        if (!sourceRoles.isEmpty() && sourceRoles.stream().noneMatch(UserRole::isPrimary)) {
+            setPrimaryRole(target, sourceRoles.get(0).getRole());
         }
     }
 
@@ -124,7 +125,7 @@ public class UserServiceImpl extends EntityServiceImpl<UserRepository, User, Str
 
     @Override
     public void signInSuccess(final String username) {
-        final var user = findOneByUsername(username).orElseThrow(() -> getExceptions().entityNotFound(username));
+        final var user = findOneByUsername(username).orElseThrow(() -> getExceptions().entityNotExists(username));
         user.setSignedInAt(DateUtils.currentDateTime());
         user.setSignInFailureCount(0L);
         save(user);

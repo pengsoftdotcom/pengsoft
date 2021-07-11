@@ -62,9 +62,9 @@ export class JobComponent extends TreeEntityComponent<JobService> implements OnI
         private role: RoleService,
         private post: PostService,
         private departmentService: DepartmentService,
-        protected entity: JobService,
-        protected modal: NzModalService,
-        protected message: NzMessageService
+        public entity: JobService,
+        public modal: NzModalService,
+        public message: NzMessageService
     ) {
         super(entity, modal, message);
         this.allowLoadNavData = true;
@@ -103,11 +103,6 @@ export class JobComponent extends TreeEntityComponent<JobService> implements OnI
 
     initListToolbar(): void {
         super.initListToolbar();
-        if (this.allowLoadNavData) {
-            this.listToolbar.splice(1, 0,
-                { name: '切换机构', type: 'link', authority: 'basedata::organization::find_all', action: () => this.switchOrganization() }
-            );
-        }
         this.listToolbar.find(button => button.name === '新增').disabled = () => !this.department;
     }
 
@@ -128,8 +123,6 @@ export class JobComponent extends TreeEntityComponent<JobService> implements OnI
         }
         if (this.organization) {
             super.afterInit();
-        } else {
-            this.switchOrganization();
         }
     }
 
@@ -198,28 +191,6 @@ export class JobComponent extends TreeEntityComponent<JobService> implements OnI
             this.filterForm['department.id'] = this.department.id;
         }
         super.afterFilterFormReset();
-    }
-
-    switchOrganization(): void {
-        this.modal.create({
-            nzTitle: '切换机构',
-            nzContent: SwitchOrganizationComponent,
-            nzOnOk: component => {
-                this.organization = component.form.organization;
-                this.title = this.organization.name;
-                this.afterInit();
-            },
-            nzOnCancel: () => {
-                if (!this.organization) {
-                    this.modal.confirm({
-                        nzTitle: '确认',
-                        nzContent: '如不选择机构，将退回到最近一次打开页面',
-                        nzOnOk: () => this.location.back()
-                    });
-                    return false;
-                }
-            }
-        });
     }
 
 }

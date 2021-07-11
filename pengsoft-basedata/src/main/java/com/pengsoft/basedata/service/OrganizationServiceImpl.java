@@ -1,15 +1,18 @@
 package com.pengsoft.basedata.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.pengsoft.basedata.domain.Organization;
 import com.pengsoft.basedata.domain.Person;
 import com.pengsoft.basedata.repository.OrganizationRepository;
-import com.pengsoft.support.service.TreeEntityServiceImpl;
+import com.pengsoft.support.service.EntityServiceImpl;
 import com.pengsoft.support.util.EntityUtils;
 import com.pengsoft.support.util.StringUtils;
 
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 /**
@@ -20,7 +23,7 @@ import org.springframework.stereotype.Service;
  */
 @Primary
 @Service
-public class OrganizationServiceImpl extends TreeEntityServiceImpl<OrganizationRepository, Organization, String>
+public class OrganizationServiceImpl extends EntityServiceImpl<OrganizationRepository, Organization, String>
         implements OrganizationService {
 
     @Override
@@ -38,16 +41,47 @@ public class OrganizationServiceImpl extends TreeEntityServiceImpl<OrganizationR
         if (StringUtils.isBlank(organization.getShortName())) {
             organization.setShortName(organization.getName());
         }
-        super.save(organization);
-        if (StringUtils.notEquals(organization.getId(), organization.getBelongsTo())) {
-            getRepository().updateBelongsTo(organization.getId());
-        }
-        return organization;
+        return super.save(organization);
+    }
+
+    @Override
+    public Optional<Organization> findOneByCode(String code) {
+        return getRepository().findOneByCode(code);
+    }
+
+    @Override
+    public Optional<Organization> findOneByName(String name) {
+        return getRepository().findOneByName(name);
     }
 
     @Override
     public List<Organization> findAllByAdmin(final Person admin) {
         return getRepository().findAllByAdminId(admin.getId());
+    }
+
+    @Override
+    public long countByAdmin(Person admin) {
+        return getRepository().countByAdmin(admin);
+    }
+
+    @Override
+    public Page<Organization> findPageOfAvailableConsumers(Organization supplier, Pageable pageable) {
+        return getRepository().findPageOfAvailableConsumers(supplier, pageable);
+    }
+
+    @Override
+    public List<Organization> findAllAvailableConsumers(Organization supplier) {
+        return getRepository().findAllAvailableConsumers(supplier);
+    }
+
+    @Override
+    public Page<Organization> findPageOfAvailableSuppliers(Organization consumer, Pageable pageable) {
+        return getRepository().findPageOfAvailableSuppliers(consumer, pageable);
+    }
+
+    @Override
+    public List<Organization> findAllAvailableSuppliers(Organization consumer) {
+        return getRepository().findAllAvailableSuppliers(consumer);
     }
 
 }

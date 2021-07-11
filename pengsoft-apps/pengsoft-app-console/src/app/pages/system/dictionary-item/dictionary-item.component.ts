@@ -29,9 +29,9 @@ export class DictionaryItemComponent extends TreeEntityComponent<DictionaryItemS
 
     constructor(
         private security: SecurityService,
-        protected entity: DictionaryItemService,
-        protected modal: NzModalService,
-        protected message: NzMessageService
+        public entity: DictionaryItemService,
+        public modal: NzModalService,
+        public message: NzMessageService
     ) {
         super(entity, modal, message);
     }

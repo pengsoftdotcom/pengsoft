@@ -9,5 +9,6 @@ pengsoft:
       clients:
         - id: pengsoft
           secret: pengsoft
+          access-token-validity-seconds: 2592000
           grant-types:
             - password  

@@ -44,7 +44,7 @@ public class Exceptions {
      *
      * @param key The entity key.
      */
-    public IllegalArgumentException entityNotFound(final String key) {
+    public IllegalArgumentException entityNotExists(final String key) {
         return new IllegalArgumentException(
                 "the entity with given key('" + key + "') has been deleted or the given key is invalid.");
     }

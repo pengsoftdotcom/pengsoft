@@ -85,7 +85,11 @@ export class HttpService {
                     Object.assign(options.errors, err.error);
                     break;
                 case 500:
-                    this.message.error('服务器发生了一个意外的错误，如再次遇到，请联系管理员');
+                    if (err.error && err.error.error_description) {
+                        this.message.error(err.error.error_description);
+                    } else {
+                        this.message.error('服务器发生了一个意外的错误，如再次遇到，请联系管理员');
+                    }
                     break;
                 default:
                     break;

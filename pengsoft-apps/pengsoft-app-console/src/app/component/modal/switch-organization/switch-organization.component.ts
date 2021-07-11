@@ -1,9 +1,7 @@
 import { Component } from '@angular/core';
 import { OrganizationService } from 'src/app/service/basedata/organization.service';
-import { EntityUtils } from 'src/app/util/entity-utils';
 import { FieldUtils } from 'src/app/util/field-utils';
 import { BaseComponent } from '../../support/base.component';
-import { Option } from '../../support/form-item/option';
 import { InputComponent } from '../../support/input/input.component';
 
 @Component({
@@ -13,7 +11,7 @@ import { InputComponent } from '../../support/input/input.component';
 })
 export class SwitchOrganizationComponent extends BaseComponent {
 
-    field = FieldUtils.buildTreeSelect({
+    field = FieldUtils.buildSelect({
         code: 'organization',
         edit: {
             label: { visible: false },
@@ -25,7 +23,7 @@ export class SwitchOrganizationComponent extends BaseComponent {
                     }
                     this.organization.findAll(params, {
                         before: () => this.loading = true,
-                        success: (res: any) => component.edit.input.options = EntityUtils.convertListToTree(res) as Option[],
+                        success: (res: any) => component.edit.input.options = res.map(entity => Object.assign({ label: entity.name, value: entity })),
                         after: () => this.loading = false
                     });
                 }

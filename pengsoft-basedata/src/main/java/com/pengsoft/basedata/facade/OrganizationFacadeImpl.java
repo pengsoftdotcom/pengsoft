@@ -1,6 +1,7 @@
 package com.pengsoft.basedata.facade;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -10,16 +11,17 @@ import com.pengsoft.basedata.domain.Organization;
 import com.pengsoft.basedata.domain.Person;
 import com.pengsoft.basedata.service.OrganizationService;
 import com.pengsoft.basedata.service.PersonService;
-import com.pengsoft.security.domain.Role;
 import com.pengsoft.security.domain.User;
 import com.pengsoft.security.domain.UserRole;
 import com.pengsoft.security.service.RoleService;
 import com.pengsoft.security.service.UserService;
-import com.pengsoft.security.util.SecurityUtils;
-import com.pengsoft.support.facade.TreeEntityFacadeImpl;
+import com.pengsoft.support.facade.EntityFacadeImpl;
+import com.pengsoft.support.util.EntityUtils;
 import com.pengsoft.support.util.StringUtils;
 
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 /**
@@ -29,7 +31,7 @@ import org.springframework.stereotype.Service;
  * @since 1.0.0
  */
 @Service
-public class OrganizationFacadeImpl extends TreeEntityFacadeImpl<OrganizationService, Organization, String>
+public class OrganizationFacadeImpl extends EntityFacadeImpl<OrganizationService, Organization, String>
         implements OrganizationFacade {
 
     public static final String BASEDATA_ORGANIZATION_ADMIN = "basedata_organization_admin";
@@ -46,48 +48,87 @@ public class OrganizationFacadeImpl extends TreeEntityFacadeImpl<OrganizationSer
     private RoleService roleService;
 
     @Override
-    public Organization save(final Organization organization) {
-        if (organization.getAdmin() != null) {
-            final var person = personService.findOneByMobile(organization.getAdmin().getMobile())
-                    .orElse(organization.getAdmin());
-            if (StringUtils.isBlank(person.getId())) {
-                final var user = userService.findOneByMobile(person.getMobile())
-                        .orElse(new User(person.getMobile(), UUID.randomUUID().toString()));
-                if (StringUtils.isBlank(user.getId())) {
-                    userService.saveWithoutValidation(user);
-                }
-                person.setUser(user);
+    public Organization save(Organization target) {
+        Organization source = null;
+        Person sourceAdmin = null;
+        Person targetAdmin = target.getAdmin();
+        User sourceUser = null;
+        User targetUser = null;
+
+        if (targetAdmin != null) {
+            if (StringUtils.isBlank(targetAdmin.getId())) {
+                personService.findOneByMobile(targetAdmin.getMobile())
+                        .ifPresent(person -> getExceptions().entityNotExists(targetAdmin.getMobile()));
+                targetUser = userService.save(new User(targetAdmin.getMobile(), UUID.randomUUID().toString()));
+                userService.grantRoles(targetUser, List.of(roleService.findOneByCode(ORGANIZATION_ADMIN)
+                        .orElseThrow(() -> getExceptions().entityNotExists(ORGANIZATION_ADMIN))));
+                targetAdmin.setUser(targetUser);
+                targetAdmin.setCreatedBy(targetUser.getId());
             } else {
-                BeanUtils.copyProperties(organization.getAdmin(), person, "id", "mobile", "user", "version");
+                sourceAdmin = personService.findOne(targetAdmin.getId())
+                        .orElseThrow(() -> getExceptions().entityNotExists(targetAdmin.getId()));
+                BeanUtils.copyProperties(sourceAdmin, targetAdmin, "id", "mobile", "user", "version");
             }
+            personService.save(targetAdmin);
+        }
 
-            if (!SecurityUtils.hasAnyRole(ORGANIZATION_ADMIN)
-                    && SecurityUtils.hasAnyRole(Role.ADMIN, BASEDATA_ORGANIZATION_ADMIN)) {
-                final var createdBy = person.getUser().getId();
-                person.setCreatedBy(createdBy);
-                organization.setCreatedBy(createdBy);
-            }
-
-            organization.setAdmin(personService.save(person));
-            final var roles = person.getUser().getUserRoles().stream().map(UserRole::getRole)
-                    .collect(Collectors.toList());
-            if (roles.stream().noneMatch(role -> ORGANIZATION_ADMIN.equals(role.getCode()))) {
-                final var role = roleService.findOneByCode(ORGANIZATION_ADMIN).orElse(new Role(ORGANIZATION_ADMIN));
-                if (StringUtils.isBlank(role.getId())) {
-                    roleService.save(role);
-                }
-                roles.add(role);
-                userService.grantRoles(person.getUser(), roles);
+        if (StringUtils.isNotBlank(target.getId())) {
+            source = findOne(target.getId()).orElseThrow(() -> getExceptions().entityNotExists(target.getId()));
+            sourceAdmin = source.getAdmin();
+            if (sourceAdmin != null && targetAdmin != null && EntityUtils.ne(sourceAdmin, targetAdmin)
+                    && countByAdmin(sourceAdmin) == 1) {
+                sourceUser = sourceAdmin.getUser();
+                sourceUser.getUserRoles().removeIf(userRole -> userRole.getRole().getCode().equals(ORGANIZATION_ADMIN));
+                userService.grantRoles(sourceUser,
+                        sourceUser.getUserRoles().stream().map(UserRole::getRole).collect(Collectors.toList()));
             }
         }
-        super.save(organization);
-        organization.setBelongsTo(organization.getId());
-        return super.save(organization);
+
+        target.setAdmin(targetAdmin);
+        if (targetUser != null) {
+            target.setCreatedBy(targetUser.getId());
+        }
+        return super.save(target);
+    }
+
+    @Override
+    public Optional<Organization> findOneByCode(String code) {
+        return getService().findOneByCode(code);
+    }
+
+    @Override
+    public Optional<Organization> findOneByName(String name) {
+        return getService().findOneByName(name);
     }
 
     @Override
     public List<Organization> findAllByAdmin(final Person admin) {
         return getService().findAllByAdmin(admin);
+    }
+
+    @Override
+    public long countByAdmin(Person admin) {
+        return getService().countByAdmin(admin);
+    }
+
+    @Override
+    public Page<Organization> findPageOfAvailableConsumers(Organization supplier, Pageable pageable) {
+        return getService().findPageOfAvailableConsumers(supplier, pageable);
+    }
+
+    @Override
+    public List<Organization> findAllAvailableConsumers(Organization supplier) {
+        return getService().findAllAvailableConsumers(supplier);
+    }
+
+    @Override
+    public Page<Organization> findPageOfAvailableSuppliers(Organization consumer, Pageable pageable) {
+        return getService().findPageOfAvailableSuppliers(consumer, pageable);
+    }
+
+    @Override
+    public List<Organization> findAllAvailableSuppliers(Organization consumer) {
+        return getService().findAllAvailableSuppliers(consumer);
     }
 
 }

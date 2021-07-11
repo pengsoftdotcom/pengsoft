@@ -36,21 +36,9 @@ export class UserDetailsService extends BaseService {
         }
     }
 
-    setCurrentJob(job: any, options: HttpOptions): void {
-        options.params = { id: job.id };
-        const url = this.getApiPath('set-current-job');
-        this.http.request('POST', url, options);
-    }
-
     setPrimaryJob(job: any, options: HttpOptions): void {
         options.params = { id: job.id };
         const url = this.getApiPath('set-primary-job');
-        this.http.request('POST', url, options);
-    }
-
-    setCurrentRole(role: any, options: HttpOptions): void {
-        options.params = { id: role.id };
-        const url = this.getApiPath('set-current-role');
         this.http.request('POST', url, options);
     }
 
@@ -73,6 +61,11 @@ export class UserDetailsService extends BaseService {
         options.body.set('captcha', captcha);
         const url = this.getApiPath('reset-password');
         this.http.request('POST', url, options);
+    }
+
+    signOut(): void {
+        const url = this.getApiPath('sign-out');
+        this.http.request('POST', url, {});
     }
 
 }

@@ -41,17 +41,37 @@ export abstract class EntityComponent<S extends EntityService> extends BaseCompo
     errors = {};
 
     constructor(
-        protected entity: S,
-        protected modal: NzModalService,
-        protected message: NzMessageService
+        public entity: S,
+        public modal: NzModalService,
+        public message: NzMessageService
     ) {
         super();
     }
 
     ngOnInit(): void {
         this.initFields();
-        this.fields.filter(field => field.children).forEach(field => field.children.forEach(subfield => subfield.parentCode = field.code));
-        this.intEditToolbar();
+        let fields = this.fields.filter(field => field.children);
+        while (fields.length > 0) {
+            const subFields = []
+            fields.forEach(field => field.children.forEach(subField => {
+                subFields.push(subField);
+                if (field.parentCode) {
+                    subField.parentCode = field.parentCode + '.' + field.code;
+                } else {
+                    subField.parentCode = field.code;
+                }
+                if (field.list.childrenVisible === false) {
+                    subField.list.visible = false;
+                    subField.list.childrenVisible = false;
+                }
+                if (field.edit.childrenVisible === false) {
+                    subField.edit.visible = false;
+                    subField.edit.childrenVisible = false;
+                }
+            }));
+            fields = subFields.filter(subField => subField.children);
+        }
+        this.initEditToolbar();
         this.initListToolbar();
         this.initListAction();
         this.afterInit();
@@ -63,7 +83,7 @@ export abstract class EntityComponent<S extends EntityService> extends BaseCompo
 
     abstract getEditComponent(): EditComponent;
 
-    intEditToolbar(): void {
+    initEditToolbar(): void {
         this.editToolbar = [
             { name: '保存', type: 'primary', size: 'default', action: () => this.save(), authority: this.getAuthority('save') }
         ];
@@ -76,7 +96,7 @@ export abstract class EntityComponent<S extends EntityService> extends BaseCompo
             { name: '批量删除', type: 'primary', danger: true, action: () => this.delete(), authority: this.getAuthority('delete') }
         ];
         if (this.fields.some(field => field.filter)
-            || this.fields.filter(field => field.children).some(field => field.children.some(subfield => subfield.filter))) {
+            || this.fields.filter(field => field.children).some(field => field.children.some(subField => subField.filter))) {
             this.listToolbar.splice(1, 0, {
                 name: '搜索',
                 icon: 'search',
@@ -156,18 +176,15 @@ export abstract class EntityComponent<S extends EntityService> extends BaseCompo
         this.entity.save(form, {
             errors: this.errors,
             before: () => this.getEditComponent().loading = true,
-            success: (res: any) => {
-                this.message.info('保存成功');
-                this.getEditComponent().hide();
-                this.list();
-            },
-            failure: (err: any) => {
-                if (err.status === 422) {
-                    this.message.error('保存失败');
-                }
-            },
+            success: (res: any) => this.saveSuccess(res),
             after: () => this.getEditComponent().loading = false
         });
+    }
+
+    saveSuccess(res: any): void {
+        this.message.info('保存成功');
+        this.getEditComponent().hide();
+        this.list();
     }
 
     protected buildForm() {
@@ -234,8 +251,8 @@ export abstract class EntityComponent<S extends EntityService> extends BaseCompo
                             this.getListComponent().allChecked = false;
                             this.getListComponent().indeterminate = false;
                             this.message.info('删除成功');
-                            resolve();
-                        }
+                        },
+                        after: resolve
                     });
                 })
             });

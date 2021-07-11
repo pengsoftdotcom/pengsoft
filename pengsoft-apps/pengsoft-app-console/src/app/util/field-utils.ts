@@ -221,6 +221,7 @@ export class FieldUtils {
             sortable: false,
             sortPriority: 99,
             visible: true,
+            childrenVisible: true,
             align: 'left'
         }, list);
         if (!field) {

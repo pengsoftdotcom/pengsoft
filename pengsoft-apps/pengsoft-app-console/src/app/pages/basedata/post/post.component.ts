@@ -30,9 +30,9 @@ export class PostComponent extends TreeEntityComponent<PostService> implements O
     constructor(
         private location: Location,
         private security: SecurityService,
-        protected entity: PostService,
-        protected modal: NzModalService,
-        protected message: NzMessageService
+        public entity: PostService,
+        public modal: NzModalService,
+        public message: NzMessageService
     ) {
         super(entity, modal, message);
         this.organization = this.security.userDetails.organization;
@@ -50,15 +50,6 @@ export class PostComponent extends TreeEntityComponent<PostService> implements O
             FieldUtils.buildTreeSelect({ code: 'organization', name: '机构', list: { visible: false }, edit: { visible: false } }),
             FieldUtils.buildTextForName()
         );
-    }
-
-    initListToolbar(): void {
-        super.initListToolbar();
-        if (this.allowLoadNavData) {
-            this.listToolbar.splice(1, 0,
-                { name: '切换机构', type: 'link', authority: 'basedata::organization::find_all', action: () => this.switchOrganization() }
-            );
-        }
     }
 
     afterInit(): void {

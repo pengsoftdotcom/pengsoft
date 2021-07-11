@@ -12,7 +12,6 @@ import com.pengsoft.basedata.domain.Organization;
 import com.pengsoft.basedata.domain.OwnedExt;
 import com.pengsoft.basedata.domain.Person;
 import com.pengsoft.basedata.domain.Staff;
-import com.pengsoft.basedata.facade.OrganizationFacade;
 import com.pengsoft.basedata.repository.OwnedExtRepository;
 import com.pengsoft.basedata.service.JobService;
 import com.pengsoft.basedata.service.StaffService;
@@ -50,9 +49,6 @@ public class AdvancedApiMethodArgumentsHandler<T extends Entity<ID>, ID extends 
     public static final String ORGANIZATION_ADMIN = "organization_admin";
 
     @Inject
-    private OrganizationFacade organizationFacade;
-
-    @Inject
     private JobService jobService;
 
     @Inject
@@ -75,7 +71,7 @@ public class AdvancedApiMethodArgumentsHandler<T extends Entity<ID>, ID extends 
                     organization = SecurityUtilsExt.getOrganization();
                 } else {
                     organization = SecurityUtilsExt.getOrganization();
-                    final var job = SecurityUtilsExt.getCurrentJob();
+                    final var job = SecurityUtilsExt.getPrimaryJob();
                     if (job != null) {
                         result.or(getCreatedByPredicate(entityClass, job));
                     }
@@ -90,11 +86,8 @@ public class AdvancedApiMethodArgumentsHandler<T extends Entity<ID>, ID extends 
     }
 
     private BooleanExpression getBelongsToPredicate(final Class<T> entityClass, final Organization organization) {
-        final var organizations = organizationFacade.findAllByParentIdsStartsWith(
-                organization.getParentIds() + StringUtils.GLOBAL_SEPARATOR + organization.getId());
-        organizations.add(organization);
         final var belongsToPath = (StringPath) QueryDslUtils.getPath(entityClass, "belongsTo");
-        return belongsToPath.in(organizations.stream().map(Organization::getId).collect(Collectors.toList()));
+        return belongsToPath.eq(organization.getId());
     }
 
     private BooleanExpression getCreatedByPredicate(final Class<T> entityClass, final Job job) {
@@ -118,8 +111,8 @@ public class AdvancedApiMethodArgumentsHandler<T extends Entity<ID>, ID extends 
     public boolean check(final Owned entity) {
         final var id = ((T) entity).getId();
         if (id != null && OwnedExt.class.isAssignableFrom(entity.getClass())
-                && SecurityUtilsExt.getCurrentJob() != null) {
-            final var job = SecurityUtilsExt.getCurrentJob();
+                && SecurityUtilsExt.getPrimaryJob() != null) {
+            final var job = SecurityUtilsExt.getPrimaryJob();
             if (job.isOrganizationChief()
                     && StringUtils.equals(SecurityUtilsExt.getOrganizationId(), ((OwnedExt) entity).getBelongsTo())) {
                 return true;
@@ -138,10 +131,10 @@ public class AdvancedApiMethodArgumentsHandler<T extends Entity<ID>, ID extends 
                 getEntityAdminRoleCode(entityClass))) {
             return true;
         } else {
-            if (OwnedExt.class.isAssignableFrom(entityClass) && SecurityUtilsExt.getCurrentJob() != null) {
+            if (OwnedExt.class.isAssignableFrom(entityClass) && SecurityUtilsExt.getPrimaryJob() != null) {
                 final var repository = (OwnedExtRepository) getRepositories().getRepositoryFor(entityClass).orElseThrow(
                         () -> new MissingConfigurationException("no repository for class: " + entityClass.getName()));
-                final var job = SecurityUtilsExt.getCurrentJob();
+                final var job = SecurityUtilsExt.getPrimaryJob();
                 var matched = false;
                 final var stringIds = ids.stream().map(String.class::cast).collect(Collectors.toList());
                 if (job.isOrganizationChief()) {

@@ -45,7 +45,7 @@ public class JobServiceImpl extends TreeEntityServiceImpl<JobRepository, Job, St
         if (!SecurityUtils.hasAnyRole(OrganizationFacadeImpl.ORGANIZATION_ADMIN)
                 && SecurityUtils.hasAnyRole(Role.ADMIN, OrganizationFacadeImpl.BASEDATA_ORGANIZATION_ADMIN)) {
             job.setCreatedBy(job.getDepartment().getOrganization().getCreatedBy());
-            job.setBelongsTo(job.getDepartment().getOrganization().getBelongsTo());
+            job.setBelongsTo(job.getDepartment().getOrganization().getId());
         }
         return super.save(job);
     }

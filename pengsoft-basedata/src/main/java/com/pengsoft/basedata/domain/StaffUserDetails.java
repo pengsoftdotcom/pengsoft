@@ -41,7 +41,7 @@ public class StaffUserDetails extends PersonUserDetails {
         setJobs(jobs);
         setPrimaryJob(staff.getJob());
         setDepartment(staff.getDepartment());
-        setOrganization(staff.getOrganization());
+        setOrganization(staff.getDepartment().getOrganization());
     }
 
 }

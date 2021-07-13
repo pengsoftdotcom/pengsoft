@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { TreeEntityService } from '../support/tree-entity.service';
 import { HttpService } from '../support/http.service';
+import { TreeEntityService } from '../support/tree-entity.service';
 
 @Injectable({
     providedIn: 'root'

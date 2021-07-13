@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { FullScreenForgetPasswordComponent } from './forget-password.component';
+
 
 describe('ForgetPasswordComponent', () => {
     let component: FullScreenForgetPasswordComponent;

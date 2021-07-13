@@ -7,7 +7,9 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import com.pengsoft.security.annotation.Authorized;
 import com.pengsoft.security.domain.Owned;
+import com.pengsoft.security.util.SecurityUtils;
 import com.pengsoft.support.aspect.JoinPoints;
 import com.pengsoft.support.domain.Entity;
 import com.pengsoft.support.util.ClassUtils;
@@ -16,6 +18,7 @@ import com.querydsl.core.types.Predicate;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.security.access.AccessDeniedException;
 
 /**
@@ -34,10 +37,13 @@ public class HandleApiDataAuthorityAspect<T extends Entity<ID>, ID extends Seria
     @SuppressWarnings("unchecked")
     @Around(JoinPoints.ALL_API)
     public Object handle(final ProceedingJoinPoint jp) throws Throwable {
-        final var args = jp.getArgs();
         final var apiClass = jp.getTarget().getClass();
         final var entityClass = (Class<T>) ClassUtils.getSuperclassGenericType(apiClass, 1);
-        if (Owned.class.isAssignableFrom(entityClass)) {
+        var method = ((MethodSignature) jp.getSignature()).getMethod();
+        method = ClassUtils.getPublicMethod(apiClass, jp.getSignature().getName(), method.getParameterTypes());
+        final var args = jp.getArgs();
+        if (apiClass.getAnnotation(Authorized.class) == null && method.getAnnotation(Authorized.class) == null
+                && SecurityUtils.getUserDetails() != null && Owned.class.isAssignableFrom(entityClass)) {
             final var length = args.length;
             for (var i = 0; i < length; i++) {
                 if (args[i] instanceof Predicate) {

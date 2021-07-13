@@ -1,4 +1,3 @@
-import { Location } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { NzMessageService } from 'ng-zorro-antd/message';
@@ -43,7 +42,6 @@ export class StaffComponent extends EntityComponent<StaffService> implements OnI
     department: any;
 
     constructor(
-        private location: Location,
         private dictionaryItem: DictionaryItemService,
         private job: JobService,
         private departmentService: DepartmentService,
@@ -96,7 +94,6 @@ export class StaffComponent extends EntityComponent<StaffService> implements OnI
             this.listToolbar.splice(2, 0, {
                 name: '切换机构',
                 type: 'link',
-                authority: 'basedata::organization::find_all',
                 action: () => this.switchOrganization()
             });
         }
@@ -120,10 +117,12 @@ export class StaffComponent extends EntityComponent<StaffService> implements OnI
 
     afterInit(): void {
         if (this.department) {
-            this.filterForm['organization.id'] = this.organization.id;
+            delete this.filterForm['department.organization.id'];
             this.filterForm['department.id'] = this.department.id;
         }
         if (this.organization) {
+            delete this.filterForm['department.id'];
+            this.filterForm['department.organization.id'] = this.organization.id;
             super.afterInit();
         } else {
             this.switchOrganization();
@@ -177,9 +176,10 @@ export class StaffComponent extends EntityComponent<StaffService> implements OnI
 
     afterFilterFormReset(): void {
         if (this.organization) {
-            this.filterForm['organization.id'] = this.organization.id;
+            this.filterForm['department.organization.id'] = this.organization.id;
         }
         if (this.department) {
+            delete this.filterForm['department.organization.id'];
             this.filterForm['department.id'] = this.department.id;
         }
         super.afterFilterFormReset();

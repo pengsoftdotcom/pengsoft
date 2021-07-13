@@ -1,8 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { InputType } from 'src/app/enum/input-type.enum';
 import { BaseComponent } from '../base.component';
-import { Field } from './field';
 import { Edit } from './edit';
+import { Field } from './field';
 
 @Component({
     selector: 'app-form-item',

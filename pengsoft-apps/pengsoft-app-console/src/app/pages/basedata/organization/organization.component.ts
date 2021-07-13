@@ -97,6 +97,20 @@ export class OrganizationComponent extends EntityComponent<OrganizationService> 
         ];
     }
 
+    initListToolbar(): void {
+        super.initListToolbar();
+        this.listToolbar.forEach(button => {
+            switch (button.name) {
+                case '刷新':
+                case '搜索':
+                    delete button.authority;
+                    break;
+                default:
+                    break;
+            }
+        });
+    }
+
     initListAction(): void {
         super.initListAction();
         this.listAction.splice(0, 0, {

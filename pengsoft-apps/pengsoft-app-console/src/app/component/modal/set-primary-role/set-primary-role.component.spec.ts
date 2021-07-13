@@ -1,6 +1,6 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
+wimport { ComponentFixture, TestBed } from '@angular/core/testing';
 import { SetPrimaryRoleComponent } from './set-primary-role.component';
+
 
 describe('SetPrimaryRoleComponent', () => {
     let component: SetPrimaryRoleComponent;

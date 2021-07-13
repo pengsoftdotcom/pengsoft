@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
-
 import { DictionaryTypeService } from './dictionary-type.service';
+
 
 describe('DictionaryTypeService', () => {
     let service: DictionaryTypeService;

@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
-
 import { AuthorityService } from './authority.service';
+
 
 describe('AuthorityService', () => {
     let service: AuthorityService;

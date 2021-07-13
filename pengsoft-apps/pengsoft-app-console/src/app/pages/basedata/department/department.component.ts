@@ -1,5 +1,5 @@
 import { Location } from '@angular/common';
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { SwitchOrganizationComponent } from 'src/app/component/modal/switch-organization/switch-organization.component';
@@ -61,6 +61,17 @@ export class DepartmentComponent extends TreeEntityComponent<DepartmentService> 
         );
     }
 
+    initListToolbar(): void {
+        super.initListToolbar();
+        if (!this.security.userDetails.organization) {
+            this.listToolbar.splice(2, 0, {
+                name: '切换机构',
+                type: 'link',
+                action: () => this.switchOrganization()
+            });
+        }
+    }
+
     initListAction(): void {
         super.initListAction();
         this.listAction.splice(0, 0, {
@@ -73,9 +84,25 @@ export class DepartmentComponent extends TreeEntityComponent<DepartmentService> 
     }
 
     afterInit(): void {
-        this.filterForm = { 'organization.id': this.organization.id };
-        this.editForm = { organization: this.organization };
-        super.afterInit();
+        if (this.organization) {
+            this.filterForm = { 'organization.id': this.organization.id };
+            this.editForm = { organization: this.organization };
+            super.afterInit();
+        } else {
+            this.switchOrganization();
+        }
+    }
+
+    switchOrganization(): void {
+        this.modal.create({
+            nzTitle: '切换机构',
+            nzContent: SwitchOrganizationComponent,
+            nzOnOk: component => {
+                this.organization = component.form.organization;
+                this.title = this.organization.name;
+                this.afterInit();
+            }
+        });
     }
 
     editJobs(department: any): void {

@@ -50,8 +50,4 @@ public class Staff extends OwnedExtEntity {
     @NotFound(action = NotFoundAction.IGNORE)
     private Department department;
 
-    @ManyToOne
-    @NotFound(action = NotFoundAction.IGNORE)
-    private Organization organization;
-
 }

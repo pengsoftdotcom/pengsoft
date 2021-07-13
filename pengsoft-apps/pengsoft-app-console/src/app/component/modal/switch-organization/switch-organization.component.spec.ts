@@ -1,6 +1,6 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { SwitchOrganizationComponent } from './switch-organization.component';
+
 
 describe('SwitchOrganizationComponent', () => {
     let component: SwitchOrganizationComponent;

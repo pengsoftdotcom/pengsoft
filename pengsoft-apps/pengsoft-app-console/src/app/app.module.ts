@@ -23,9 +23,9 @@ import { IconsProviderModule } from './icons-provider.module';
 import { BasedataModule } from './pages/basedata/basedata.module';
 import { SecurityModule } from './pages/security/security.module';
 import { DashboardComponent } from './pages/shared/dashboard/dashboard.component';
+import { FullScreenForgetPasswordComponent } from './pages/shared/forget-password/forget-password.component';
 import { FullScreenSignInComponent } from './pages/shared/sign-in/sign-in.component';
 import { SystemModule } from './pages/system/system.module';
-import { FullScreenForgetPasswordComponent } from './pages/shared/forget-password/forget-password.component';
 
 
 registerLocaleData(zh);

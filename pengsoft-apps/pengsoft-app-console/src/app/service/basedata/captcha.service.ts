@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpService } from '../support/http.service';
 import { EntityService } from '../support/entity.service';
 import { HttpOptions } from '../support/http-options';
+import { HttpService } from '../support/http.service';
 
 @Injectable({
     providedIn: 'root'

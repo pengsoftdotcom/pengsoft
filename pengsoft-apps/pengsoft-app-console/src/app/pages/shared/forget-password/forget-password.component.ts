@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { ForgetPasswordComponent } from 'src/app/component/modal/forget-password/forget-password.component';
 import { BaseComponent } from 'src/app/component/support/base.component';

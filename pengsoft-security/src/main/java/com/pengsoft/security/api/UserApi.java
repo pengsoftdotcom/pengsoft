@@ -9,9 +9,11 @@ import com.pengsoft.security.domain.User;
 import com.pengsoft.security.domain.UserRole;
 import com.pengsoft.security.service.UserService;
 import com.pengsoft.support.api.EntityApi;
+import com.querydsl.core.types.Predicate;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -42,6 +44,18 @@ public class UserApi extends EntityApi<UserService, User, String> {
     @PostMapping("set-primary-role")
     public void setPrimaryRole(@RequestParam("user.id") final User user, @RequestParam("role.id") final Role role) {
         getService().setPrimaryRole(user, role);
+    }
+
+    @AuthorityChanged
+    @Override
+    public void save(@RequestBody User entity) {
+        super.save(entity);
+    }
+
+    @AuthorityChanged
+    @Override
+    public void delete(Predicate predicate) {
+        super.delete(predicate);
     }
 
     @GetMapping("find-all-user-roles-by-user")

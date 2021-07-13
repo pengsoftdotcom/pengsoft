@@ -1,4 +1,4 @@
-import { format, parse, isAfter } from 'date-fns';
+import { format, isAfter, parse } from 'date-fns';
 
 export class DateUtils {
 

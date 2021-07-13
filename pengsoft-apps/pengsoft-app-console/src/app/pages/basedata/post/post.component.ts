@@ -52,6 +52,17 @@ export class PostComponent extends TreeEntityComponent<PostService> implements O
         );
     }
 
+    initListToolbar(): void {
+        super.initListToolbar();
+        if (!this.security.userDetails.organization) {
+            this.listToolbar.splice(2, 0, {
+                name: '切换机构',
+                type: 'link',
+                action: () => this.switchOrganization()
+            });
+        }
+    }
+
     afterInit(): void {
         if (this.organization) {
             this.filterForm = { 'organization.id': this.organization.id };
@@ -69,16 +80,6 @@ export class PostComponent extends TreeEntityComponent<PostService> implements O
                 this.organization = component.form.organization;
                 this.title = this.organization.name;
                 this.afterInit();
-            },
-            nzOnCancel: () => {
-                if (!this.organization) {
-                    this.modal.confirm({
-                        nzTitle: '确认',
-                        nzContent: '如不选择机构，将退回到最近一次打开页面',
-                        nzOnOk: () => this.location.back()
-                    });
-                    return false;
-                }
             }
         });
     }

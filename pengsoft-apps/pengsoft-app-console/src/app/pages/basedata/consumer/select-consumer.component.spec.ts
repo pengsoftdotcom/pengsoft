@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { SelectConsumerComponent } from './select-consumer.component';
+
 
 describe('SelectConsumerComponent', () => {
     let component: SelectConsumerComponent;

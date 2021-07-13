@@ -1,5 +1,5 @@
-import { Field } from "./field";
 import { DomSanitizer, SafeHtml } from "@angular/platform-browser";
+import { Field } from "./field";
 
 export interface List {
 

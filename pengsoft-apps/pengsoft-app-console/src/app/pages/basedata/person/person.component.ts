@@ -1,11 +1,9 @@
 import { Component, ViewChild } from '@angular/core';
-import { DomSanitizer } from '@angular/platform-browser';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { ResetPasswordComponent } from 'src/app/component/modal/reset-password/reset-password.component';
 import { EditComponent } from 'src/app/component/support/edit/edit.component';
 import { EntityComponent } from 'src/app/component/support/entity.component';
-import { Field } from 'src/app/component/support/form-item/field';
 import { InputComponent } from 'src/app/component/support/input/input.component';
 import { ListComponent } from 'src/app/component/support/list/list.component';
 import { DictionaryItemService } from 'src/app/service/basedata/dictionary-item.service';

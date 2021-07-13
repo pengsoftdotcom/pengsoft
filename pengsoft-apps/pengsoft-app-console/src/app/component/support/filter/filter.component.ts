@@ -21,12 +21,12 @@ export class FilterComponent extends BaseComponent implements OnInit {
         this.fields.forEach(field => {
             queue.push(field);
             while (queue.length > 0) {
-                const parent = queue.shift();
-                if (parent.filter && parent.list.visible) {
-                    result.push(parent);
+                field = queue.shift();
+                if (field.filter && field.list.visible) {
+                    result.push(field);
                 }
-                if (parent.children) {
-                    parent.children.forEach(child => queue.push(child));
+                if (field.children) {
+                    field.children.forEach(subField => queue.push(subField));
                 }
             }
         });

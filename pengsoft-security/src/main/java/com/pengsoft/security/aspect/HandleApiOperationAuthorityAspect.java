@@ -34,13 +34,14 @@ public class HandleApiOperationAuthorityAspect {
     @SuppressWarnings("unchecked")
     @Around(JoinPoints.ALL_API)
     public Object handle(final ProceedingJoinPoint jp) throws Throwable {
-        final var args = jp.getArgs();
         final var apiClass = jp.getTarget().getClass();
-        final var method = ((MethodSignature) jp.getSignature()).getMethod();
+        final var entityClass = (Class<? extends Entity<? extends Serializable>>) ClassUtils
+                .getSuperclassGenericType(apiClass, 1);
+        var method = ((MethodSignature) jp.getSignature()).getMethod();
+        method = ClassUtils.getPublicMethod(apiClass, jp.getSignature().getName(), method.getParameterTypes());
+        final var args = jp.getArgs();
         if (apiClass.getAnnotation(Authorized.class) == null && method.getAnnotation(Authorized.class) == null
                 && SecurityUtils.getUserDetails() != null) {
-            final var entityClass = (Class<? extends Entity<? extends Serializable>>) ClassUtils
-                    .getSuperclassGenericType(apiClass, 1);
             final var modulePart = SecurityUtils.getModuleCodeFromEntityClass(entityClass);
             final var entityPart = SecurityUtils.getEntityCodeFromEntityClass(entityClass);
             final var methodPart = StringUtils.camelCaseToSnakeCase(jp.getSignature().getName(), false);

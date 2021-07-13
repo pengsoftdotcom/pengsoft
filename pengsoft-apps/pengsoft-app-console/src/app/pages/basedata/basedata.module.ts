@@ -10,6 +10,7 @@ import { ComponentModule } from 'src/app/component/component.module';
 import { BasedataRoutingModule } from './basedata-routing.module';
 import { ConsumerComponent } from './consumer/consumer.component';
 import { EditConsumerComponent } from './consumer/edit-consumer.component';
+import { SelectConsumerComponent } from './consumer/select-consumer.component';
 import { DepartmentComponent } from './department/department.component';
 import { JobComponent } from './job/job.component';
 import { EditAdminComponent } from './organization/edit-admin.component';
@@ -20,9 +21,8 @@ import { PostComponent } from './post/post.component';
 import { EditStaffComponent } from './staff/edit-staff.component';
 import { StaffComponent } from './staff/staff.component';
 import { EditSupplierComponent } from './supplier/edit-supplier.component';
-import { SupplierComponent } from './supplier/supplier.component';
 import { SelectSupplierComponent } from './supplier/select-supplier.component';
-import { SelectConsumerComponent } from './consumer/select-consumer.component';
+import { SupplierComponent } from './supplier/supplier.component';
 
 
 

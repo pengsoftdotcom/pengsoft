@@ -9,9 +9,11 @@ import com.pengsoft.security.domain.Role;
 import com.pengsoft.security.domain.RoleAuthority;
 import com.pengsoft.security.service.RoleService;
 import com.pengsoft.support.api.TreeEntityApi;
+import com.querydsl.core.types.Predicate;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,6 +33,18 @@ public class RoleApi extends TreeEntityApi<RoleService, Role, String> {
     public void grantAuthorities(@RequestParam("role.id") final Role role,
             @RequestParam(value = "authority.id", defaultValue = "") final List<Authority> authorities) {
         getService().grantAuthorities(role, authorities);
+    }
+
+    @AuthorityChanged
+    @Override
+    public void save(@RequestBody Role entity) {
+        super.save(entity);
+    }
+
+    @AuthorityChanged
+    @Override
+    public void delete(Predicate predicate) {
+        super.delete(predicate);
     }
 
     @GetMapping("find-all-role-authorities-by-role")

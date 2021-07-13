@@ -97,15 +97,17 @@ export class ListComponent extends BaseComponent implements OnInit {
         }
 
         const queue = [];
-        this.fields.forEach(field => queue.push(field));
-        while (queue.length > 0) {
-            const field = queue.shift();
-            if (field.children) {
-                field.children.forEach((subField: any) => queue.push(subField));
-            } else if (field.list.visible) {
-                this.visibleFields.push(field);
+        this.fields.forEach(field => {
+            queue.push(field);
+            while (queue.length > 0) {
+                field = queue.shift();
+                if (field.children) {
+                    field.children.forEach((subField: any) => queue.push(subField));
+                } else if (field.list.visible) {
+                    this.visibleFields.push(field);
+                }
             }
-        }
+        });
     }
 
     private initGroupable() {

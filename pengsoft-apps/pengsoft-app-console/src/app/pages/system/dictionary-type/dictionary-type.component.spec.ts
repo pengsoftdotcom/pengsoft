@@ -1,6 +1,6 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DictionaryTypeComponent } from './dictionary-type.component';
+
 
 describe('DictionaryTypeComponent', () => {
     let component: DictionaryTypeComponent;

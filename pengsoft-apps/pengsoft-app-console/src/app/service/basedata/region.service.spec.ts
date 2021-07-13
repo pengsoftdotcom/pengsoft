@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
-
 import { RegionService } from './region.service';
+
 
 describe('RegionService', () => {
     let service: RegionService;

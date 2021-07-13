@@ -22,7 +22,7 @@ export class SelectAdminComponent extends PersonComponent {
         public message: NzMessageService
     ) {
         super(dictionaryItem, entity, modal, message);
-
+        this.visible = false;
     }
 
     initListToolbar(): void {

@@ -1,6 +1,6 @@
 import { EntityService } from './entity.service';
-import { HttpService } from './http.service';
 import { HttpOptions } from './http-options';
+import { HttpService } from './http.service';
 
 export abstract class TreeEntityService extends EntityService {
 

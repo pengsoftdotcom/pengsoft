@@ -1,6 +1,6 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { EditManyToManyComponent } from './edit-many-to-many.component';
+
 
 describe('EditManyToManyComponent', () => {
     let component: EditManyToManyComponent;

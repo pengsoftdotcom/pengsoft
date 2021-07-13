@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { EditComponent } from 'src/app/component/support/edit/edit.component';
 
 @Component({

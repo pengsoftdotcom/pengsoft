@@ -1,6 +1,4 @@
 import { NgModule } from '@angular/core';
-import { NZ_ICONS, NzIconModule } from 'ng-zorro-antd/icon';
-
 import {
     BookOutline,
     DashboardOutline,
@@ -13,8 +11,10 @@ import {
     ReloadOutline,
     SafetyOutline,
     SettingOutline,
-    UserOutline,
+    UserOutline
 } from '@ant-design/icons-angular/icons';
+import { NzIconModule, NZ_ICONS } from 'ng-zorro-antd/icon';
+
 
 const icons = [
     BookOutline,

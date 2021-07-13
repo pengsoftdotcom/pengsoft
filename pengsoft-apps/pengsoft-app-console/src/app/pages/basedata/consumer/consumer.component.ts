@@ -72,7 +72,6 @@ export class ConsumerComponent extends EntityComponent<SupplierConsumerService> 
             this.listToolbar.splice(2, 0, {
                 name: '切换机构',
                 type: 'link',
-                authority: 'basedata::organization::find_all',
                 action: () => this.switchOrganization()
             });
         }
@@ -85,7 +84,7 @@ export class ConsumerComponent extends EntityComponent<SupplierConsumerService> 
 
     initEditToolbar(): void {
         super.initEditToolbar();
-        this.editToolbar.splice(1, 0, { name: '选择', type: 'default', size: 'default', action: (row: any) => this.showSelectSupplier(), authority: 'basedata::organization::find_all' });
+        this.editToolbar.splice(1, 0, { name: '选择', type: 'default', size: 'default', action: (row: any) => this.showSelectSupplier() });
     }
 
     afterEdit(): void {

@@ -7,7 +7,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotated methods or classes will be ignored for security checks.
+ * The authority check will ignore the annotated classes and methods.
  *
  * @author peng.dang@pengsoft.com
  * @since 1.0.0

@@ -1,5 +1,4 @@
-import { Location } from '@angular/common';
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { NzFormatEmitEvent } from 'ng-zorro-antd/tree';
@@ -57,7 +56,6 @@ export class JobComponent extends TreeEntityComponent<JobService> implements OnI
     department: any;
 
     constructor(
-        private location: Location,
         private security: SecurityService,
         private role: RoleService,
         private post: PostService,
@@ -104,6 +102,25 @@ export class JobComponent extends TreeEntityComponent<JobService> implements OnI
     initListToolbar(): void {
         super.initListToolbar();
         this.listToolbar.find(button => button.name === '新增').disabled = () => !this.department;
+        if (!this.security.userDetails.organization) {
+            this.listToolbar.splice(2, 0, {
+                name: '切换机构',
+                type: 'link',
+                action: () => this.switchOrganization()
+            });
+        }
+    }
+
+    switchOrganization(): void {
+        this.modal.create({
+            nzTitle: '切换机构',
+            nzContent: SwitchOrganizationComponent,
+            nzOnOk: component => {
+                this.organization = component.form.organization;
+                this.title = this.organization.name;
+                this.afterInit();
+            }
+        });
     }
 
     initListAction(): void {
@@ -118,11 +135,15 @@ export class JobComponent extends TreeEntityComponent<JobService> implements OnI
 
     afterInit(): void {
         if (this.department) {
-            this.filterForm['organization.id'] = this.organization.id;
+            delete this.filterForm['department.organization.id'];
             this.filterForm['department.id'] = this.department.id;
         }
         if (this.organization) {
+            delete this.filterForm['department.id'];
+            this.filterForm['department.organization.id'] = this.organization.id;
             super.afterInit();
+        } else {
+            this.switchOrganization();
         }
     }
 
@@ -185,9 +206,10 @@ export class JobComponent extends TreeEntityComponent<JobService> implements OnI
 
     afterFilterFormReset(): void {
         if (this.organization) {
-            this.filterForm['organization.id'] = this.organization.id;
+            this.filterForm['department.organization.id'] = this.organization.id;
         }
         if (this.department) {
+            delete this.filterForm['department.organization.id'];
             this.filterForm['department.id'] = this.department.id;
         }
         super.afterFilterFormReset();

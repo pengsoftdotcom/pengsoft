@@ -1,6 +1,6 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CaptchaComponent } from './captcha.component';
+
 
 describe('CaptchaComponent', () => {
     let component: CaptchaComponent;

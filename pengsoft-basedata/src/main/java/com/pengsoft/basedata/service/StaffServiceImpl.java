@@ -13,6 +13,8 @@ import com.pengsoft.support.service.EntityServiceImpl;
 import com.pengsoft.support.util.EntityUtils;
 
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
 /**
@@ -34,8 +36,6 @@ public class StaffServiceImpl extends EntityServiceImpl<StaffRepository, Staff, 
         });
         final var department = staff.getJob().getDepartment();
         staff.setDepartment(department);
-        final var organization = department.getOrganization();
-        staff.setOrganization(organization);
         super.save(staff);
         if (staff.isPrimary()) {
             setPrimaryJob(staff.getPerson(), staff.getJob());
@@ -71,6 +71,11 @@ public class StaffServiceImpl extends EntityServiceImpl<StaffRepository, Staff, 
     @Override
     public List<Staff> findAllByJobIn(final List<Job> jobs) {
         return getRepository().findAllByJobIdIn(jobs.stream().map(Job::getId).collect(Collectors.toList()));
+    }
+
+    @Override
+    protected Sort getDefaultSort() {
+        return Sort.by(Direction.ASC, "job.parentIds");
     }
 
 }

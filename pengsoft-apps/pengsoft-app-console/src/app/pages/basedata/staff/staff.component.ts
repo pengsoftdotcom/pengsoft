@@ -52,7 +52,7 @@ export class StaffComponent extends EntityComponent<StaffService> implements OnI
     ) {
         super(entity, modal, message);
         this.allowLoadNavData = true;
-        this.organization = this.security.userDetails.organization;
+        this.organization = this.security.userDetails.primaryOrganization;
     }
 
     initFields(): void {
@@ -90,7 +90,7 @@ export class StaffComponent extends EntityComponent<StaffService> implements OnI
 
     initListToolbar(): void {
         super.initListToolbar();
-        if (!this.security.userDetails.organization) {
+        if (!this.security.userDetails.primaryOrganization) {
             this.listToolbar.splice(2, 0, {
                 name: '切换机构',
                 type: 'link',

@@ -30,7 +30,7 @@ export class RegionComponent extends TreeEntityComponent<RegionService> {
         super(entity, modal, message);
     }
 
-    get lazy(): boolean {
+    get parentQueryLazy(): boolean {
         return true;
     }
 

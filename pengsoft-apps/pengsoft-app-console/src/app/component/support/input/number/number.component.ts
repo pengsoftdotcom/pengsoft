@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { InputComponent } from '../input.component';
 
 @Component({
@@ -6,6 +6,17 @@ import { InputComponent } from '../input.component';
     templateUrl: './number.component.html',
     styleUrls: ['./number.component.scss']
 })
-export class NumberComponent extends InputComponent {
+export class NumberComponent extends InputComponent implements OnInit {
+
+    ngOnInit(): void {
+        super.ngOnInit();
+        if (!this.edit.input.mode) {
+            this.edit.input.mode = 'numeric';
+        }
+
+        if (this.edit.input.min === undefined) {
+            this.edit.input.min = 0;
+        }
+    }
 
 }

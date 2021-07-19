@@ -41,8 +41,7 @@ public class DefaultApiMethodArgumentsHandler<T extends Entity<ID>, ID extends S
 
     @Override
     public Predicate replace(final Class<T> entityClass, final Predicate predicate) {
-        if (SecurityUtils.hasAnyRole(Role.ADMIN, getModuleAdminRoleCode(entityClass),
-                getEntityAdminRoleCode(entityClass))) {
+        if (isAdmin(entityClass)) {
             return predicate;
         } else {
             return ((StringPath) QueryDslUtils.getPath(entityClass, "createdBy")).eq(SecurityUtils.getUserId())
@@ -53,25 +52,18 @@ public class DefaultApiMethodArgumentsHandler<T extends Entity<ID>, ID extends S
     @SuppressWarnings("unchecked")
     @Override
     public boolean check(final Owned entity) {
-        final var id = ((T) entity).getId();
-        final var userId = SecurityUtils.getUserId();
-        if (id == null) {
-            return true;
+        final var entityClass = (Class<T>) entity.getClass();
+        final var id = ((Entity<ID>) entity).getId();
+        if (id != null && isNotAdmin(entityClass)) {
+            return StringUtils.equals(SecurityUtils.getUserId(), entity.getCreatedBy());
         } else {
-            final var entityClass = (Class<T>) entity.getClass();
-            if (SecurityUtils.hasAnyRole(Role.ADMIN, getModuleAdminRoleCode(entityClass),
-                    getEntityAdminRoleCode(entityClass))) {
-                return true;
-            } else {
-                return StringUtils.equals(userId, entity.getCreatedBy());
-            }
+            return true;
         }
     }
 
     @Override
     public boolean check(final Class<T> entityClass, final Collection<ID> ids) {
-        if (SecurityUtils.hasAnyRole(Role.ADMIN, getModuleAdminRoleCode(entityClass),
-                getEntityAdminRoleCode(entityClass))) {
+        if (isAdmin(entityClass)) {
             return true;
         } else {
             return repositories.getRepositoryFor(entityClass).map(OwnedRepository.class::cast)
@@ -83,15 +75,13 @@ public class DefaultApiMethodArgumentsHandler<T extends Entity<ID>, ID extends S
         }
     }
 
-    protected String getModuleAdminRoleCode(final Class<T> entityClass) {
-        final var moduleCode = SecurityUtils.getModuleCodeFromEntityClass(entityClass);
-        return StringUtils.join(new String[] { moduleCode, Role.ADMIN }, StringUtils.UNDERLINE);
+    protected boolean isAdmin(final Class<? extends Entity<? extends Serializable>> entityClass) {
+        return !SecurityUtils.hasAnyRole(Role.ADMIN, SecurityUtils.getModuleAdminRoleCode(entityClass),
+                SecurityUtils.getEntityAdminRoleCode(entityClass));
     }
 
-    protected String getEntityAdminRoleCode(final Class<T> entityClass) {
-        final var moduleCode = SecurityUtils.getModuleCodeFromEntityClass(entityClass);
-        final var entityCode = SecurityUtils.getEntityCodeFromEntityClass(entityClass);
-        return StringUtils.join(new String[] { moduleCode, entityCode, Role.ADMIN }, StringUtils.UNDERLINE);
+    protected boolean isNotAdmin(final Class<? extends Entity<? extends Serializable>> entityClass) {
+        return !isAdmin(entityClass);
     }
 
 }

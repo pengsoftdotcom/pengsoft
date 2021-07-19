@@ -1,6 +1,6 @@
 package com.pengsoft.security.domain;
 
-import java.util.Collection;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -29,7 +29,7 @@ public class DefaultUserDetails implements UserDetails {
     @Getter
     @Setter
     @JsonSerialize(using = RoleCollectionJsonSerializer.class)
-    private Collection<Role> roles;
+    private List<Role> roles;
 
     @Getter
     @Setter
@@ -44,15 +44,15 @@ public class DefaultUserDetails implements UserDetails {
     @Getter
     @Setter
     @JsonSerialize(using = GrantedAuthorityCollectionJsonSerializer.class)
-    private Collection<? extends GrantedAuthority> authorities;
+    private List<GrantedAuthority> authorities;
 
-    public DefaultUserDetails(final User user, final Collection<Role> roles) {
+    public DefaultUserDetails(final User user, final List<Role> roles) {
         this.user = user;
         this.roles = roles;
     }
 
-    public DefaultUserDetails(final User user, final Collection<Role> roles, final Role primaryRole,
-            final Collection<? extends GrantedAuthority> authorities) {
+    public DefaultUserDetails(final User user, final List<Role> roles, final Role primaryRole,
+            final List<GrantedAuthority> authorities) {
         this.roles = roles;
         this.user = user;
         this.primaryRole = primaryRole;

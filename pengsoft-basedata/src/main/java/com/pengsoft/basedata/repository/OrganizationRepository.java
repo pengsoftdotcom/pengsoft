@@ -10,12 +10,12 @@ import javax.validation.constraints.NotNull;
 import com.pengsoft.basedata.domain.Organization;
 import com.pengsoft.basedata.domain.Person;
 import com.pengsoft.basedata.domain.QOrganization;
-import com.pengsoft.security.repository.OwnedRepository;
-import com.pengsoft.support.repository.EntityRepository;
+import com.pengsoft.support.repository.TreeEntityRepository;
 import com.querydsl.core.types.dsl.StringPath;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.data.querydsl.binding.QuerydslBindings;
@@ -28,17 +28,33 @@ import org.springframework.stereotype.Repository;
  * @since 1.0.0
  */
 @Repository
-public interface OrganizationRepository extends EntityRepository<QOrganization, Organization, String>, OwnedRepository {
+public interface OrganizationRepository
+        extends TreeEntityRepository<QOrganization, Organization, String>, OwnedExtRepository {
 
     @Override
     default void customize(final QuerydslBindings bindings, final QOrganization root) {
-        EntityRepository.super.customize(bindings, root);
+        TreeEntityRepository.super.customize(bindings, root);
         bindings.bind(root.code).first(StringPath::contains);
         bindings.bind(root.name).first(StringPath::contains);
         bindings.bind(root.admin.name).first(StringPath::contains);
         bindings.bind(root.admin.nickname).first(StringPath::contains);
         bindings.bind(root.admin.mobile).first(StringPath::contains);
     }
+
+    /**
+     * update the admin of the organization.
+     * 
+     * @param organization
+     * @param admin
+     * @param createdBy
+     * @param updatedBy
+     * @param controlledBy
+     * @param belongsTo
+     */
+    @Modifying
+    @Query("update Organization o set o.admin = ?2, o.createdBy = ?3, o.updatedBy = ?4, o.updatedAt = now(), o.controlledBy = ?5, o.belongsTo = ?6 where o = ?1")
+    void setAdmin(@NotNull Organization organization, Person admin, String createdBy, String updatedBy,
+            String controlledBy, String belongsTo);
 
     /**
      * Returns an {@link Optional} of a {@link Organization} with given code.
@@ -57,19 +73,20 @@ public interface OrganizationRepository extends EntityRepository<QOrganization, 
     Optional<Organization> findOneByName(@NotBlank String name);
 
     /**
-     * Returns all organizations with given admin id.
+     * Returns all organizations with given admin.
      *
-     * @param adminId The id of {@link Organization}'s admin
+     * @param admin The {@link Organization}'s admin
      */
     @QueryHints(value = @QueryHint(name = "org.hibernate.cacheable", value = "true"), forCounting = false)
-    List<Organization> findAllByAdminId(@NotBlank String adminId);
+    List<Organization> findAllByAdmin(@NotNull Person admin);
 
     /**
      * Returns the number of organizations with given admin id.
      *
      * @param adminId The {@link Organization}'s admin
      */
-    @QueryHints(value = @QueryHint(name = "org.hibernate.cacheable", value = "true"), forCounting = false)
+    // @QueryHints(value = @QueryHint(name = "org.hibernate.cacheable", value =
+    // "true"), forCounting = false)
     long countByAdmin(@NotNull Person admin);
 
     /**

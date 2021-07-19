@@ -18,6 +18,12 @@ export class RoleService extends TreeEntityService {
         return 'role';
     }
 
+    copyAuthorities(source: any, target: any, options: HttpOptions): void {
+        const url = this.getApiPath('copy-authorities');
+        options.params = { 'source.id': source.id, 'target.id': target.id };
+        this.http.request('POST', url, options);
+    }
+
     grantAuthorities(role: any, authorities: Array<any>, options: HttpOptions): void {
         const url = this.getApiPath('grant-authorities');
         options.params = { 'role.id': role.id, 'authority.id': authorities.map(authority => authority.id) };

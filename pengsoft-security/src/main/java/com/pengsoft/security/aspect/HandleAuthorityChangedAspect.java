@@ -83,7 +83,9 @@ public class HandleAuthorityChangedAspect {
                     final var roles = new ArrayList<Role>();
                     roleAuthorityRepository.findAllByAuthorityIn(authority).stream().map(RoleAuthority::getRole)
                             .forEach(role -> addAllRoles(roles, role));
-                    CollectionUtils.addAll(users, getAllUsersByRoles(roles));
+                    if (CollectionUtils.isNotEmpty(roles)) {
+                        CollectionUtils.addAll(users, getAllUsersByRoles(roles));
+                    }
                 }
                 users.forEach(
                         user -> properties.getClients()

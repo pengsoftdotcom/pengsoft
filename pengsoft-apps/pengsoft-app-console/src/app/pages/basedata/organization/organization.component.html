@@ -1,5 +1,5 @@
-<app-list #listComponent title="机构列表" [fields]="fields" [listData]="listData" [toolbar]="listToolbar"
-    [action]="listAction"></app-list>
+<app-list #listComponent title="机构列表" [fields]="fields" [listData]="listData" [pageData]="pageData"
+    [toolbar]="listToolbar" [action]="listAction" (pageChange)="list()"></app-list>
 <app-edit #editComponent title="机构编辑" [fields]="fields" [form]="editForm" [toolbar]="editToolbar" [errors]="errors">
 </app-edit>
 <app-edit-admin #editAdminComponent title="设置管理员" [fields]="fields" [form]="editForm" [toolbar]="editAdminToolbar"

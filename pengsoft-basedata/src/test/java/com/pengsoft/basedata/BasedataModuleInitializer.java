@@ -20,13 +20,13 @@ import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
 @ActiveProfiles({ "support", "security", "system", "basedata" })
-public class BasedataModuleInitializer {
+class BasedataModuleInitializer {
 
     @Inject
-    private RoleService service;
+    RoleService service;
 
     @Inject
-    private AuthorityFacade facade;
+    AuthorityFacade facade;
 
     @Test
     void initRolesAndAuthorities() {

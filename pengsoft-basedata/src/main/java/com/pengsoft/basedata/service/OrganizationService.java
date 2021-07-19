@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 
 import com.pengsoft.basedata.domain.Organization;
 import com.pengsoft.basedata.domain.Person;
-import com.pengsoft.support.service.EntityService;
+import com.pengsoft.support.service.TreeEntityService;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,7 +19,15 @@ import org.springframework.data.domain.Pageable;
  * @author peng.dang@pengsoft.com
  * @since 1.0.0
  */
-public interface OrganizationService extends EntityService<Organization, String> {
+public interface OrganizationService extends TreeEntityService<Organization, String> {
+
+    /**
+     * set the admin of the organization.
+     * 
+     * @param organization
+     * @param admin
+     */
+    void setAdmin(@NotNull Organization organization, Person admin);
 
     /**
      * Returns an {@link Optional} of a {@link Organization} with given code.

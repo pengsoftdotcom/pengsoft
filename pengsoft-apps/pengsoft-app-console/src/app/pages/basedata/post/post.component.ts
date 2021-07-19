@@ -35,10 +35,10 @@ export class PostComponent extends TreeEntityComponent<PostService> implements O
         public message: NzMessageService
     ) {
         super(entity, modal, message);
-        this.organization = this.security.userDetails.organization;
+        this.organization = this.security.userDetails.primaryOrganization;
     }
 
-    get params(): any {
+    get parentQueryParams(): any {
         if (this.organization) {
             return { 'organization.id': this.organization.id };
         }
@@ -54,7 +54,7 @@ export class PostComponent extends TreeEntityComponent<PostService> implements O
 
     initListToolbar(): void {
         super.initListToolbar();
-        if (!this.security.userDetails.organization) {
+        if (!this.security.userDetails.primaryOrganization) {
             this.listToolbar.splice(2, 0, {
                 name: '切换机构',
                 type: 'link',

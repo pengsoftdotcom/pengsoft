@@ -37,4 +37,10 @@ export interface Input {
 
     height?: number;
 
+    min?: number;
+
+    max?: number;
+
+    mode?: string;
+
 }

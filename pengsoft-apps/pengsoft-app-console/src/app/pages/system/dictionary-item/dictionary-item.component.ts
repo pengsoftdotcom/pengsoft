@@ -36,7 +36,7 @@ export class DictionaryItemComponent extends TreeEntityComponent<DictionaryItemS
         super(entity, modal, message);
     }
 
-    get params(): any {
+    get parentQueryParams(): any {
         return { 'type.id': this.type.id };
     }
 

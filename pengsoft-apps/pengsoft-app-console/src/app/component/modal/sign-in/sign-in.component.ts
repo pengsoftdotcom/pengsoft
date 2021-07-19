@@ -44,7 +44,7 @@ export class SignInComponent extends BaseComponent {
             code: 'username',
             edit: {
                 label: { visible: false },
-                input: { placeholder: '录入已绑定的手机号码', prefixIcon: 'user' }
+                input: { placeholder: '录入已绑定的手机号码', prefixIcon: 'user', mode: 'tel' }
             }
         }),
         FieldUtils.buildCaptcha()

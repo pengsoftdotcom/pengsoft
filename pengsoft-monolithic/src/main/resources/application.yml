@@ -1,6 +1,15 @@
 spring:
   profiles:
-    active: support, security, system
+    active: support, security, system, basedata
+management:
+  endpoints:
+    enabled-by-default: true
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
 pengsoft:
   security:
     oauth:

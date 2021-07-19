@@ -10,11 +10,11 @@ import { InputComponent } from './input/input.component';
 @Injectable()
 export abstract class TreeEntityComponent<S extends TreeEntityService> extends EntityComponent<S> {
 
-    get lazy(): boolean {
+    get parentQueryLazy(): boolean {
         return false;
     }
 
-    get params(): any {
+    get parentQueryParams(): any {
         return null;
     }
 
@@ -25,12 +25,12 @@ export abstract class TreeEntityComponent<S extends TreeEntityService> extends E
                 list: { visible: false },
                 edit: {
                     input: {
-                        lazy: this.lazy,
+                        lazy: this.parentQueryLazy,
                         load: (component: InputComponent, event?: NzFormatEmitEvent) => {
                             const self = this.editForm;
-                            if (this.lazy) {
+                            if (this.parentQueryLazy) {
                                 const parent = event ? event.node.origin.value : null;
-                                this.entity.findAllExcludeSelfAndItsChildrenByParent(parent, self, this.params, {
+                                this.entity.findAllExcludeSelfAndItsChildrenByParent(parent, self, this.parentQueryParams, {
                                     before: () => component.loading = true,
                                     success: (res: any) => {
                                         if (event) {
@@ -42,7 +42,7 @@ export abstract class TreeEntityComponent<S extends TreeEntityService> extends E
                                     after: () => component.loading = false
                                 });
                             } else {
-                                this.entity.findAllExcludeSelfAndItsChildren(self, this.params, {
+                                this.entity.findAllExcludeSelfAndItsChildren(self, this.parentQueryParams, {
                                     before: () => component.loading = true,
                                     success: (res: any) =>
                                         component.edit.input.options = EntityUtils.convertListToTree(res) as Option[],
@@ -57,7 +57,7 @@ export abstract class TreeEntityComponent<S extends TreeEntityService> extends E
     }
 
     list(): void {
-        if (this.lazy) {
+        if (this.parentQueryLazy) {
             this.entity.findAllByParent(null, this.filterForm, {
                 before: () => this.getListComponent().loading = true,
                 success: (res: any) => {

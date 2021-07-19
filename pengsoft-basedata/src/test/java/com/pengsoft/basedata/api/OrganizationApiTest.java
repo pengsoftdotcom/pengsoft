@@ -15,10 +15,10 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 @SpringBootTest
 @ActiveProfiles({ "support", "security", "system", "basedata" })
 @AutoConfigureMockMvc
-public class OrganizationApiTest {
+class OrganizationApiTest {
 
     @Inject
-    private MockMvc mockMvc;
+    MockMvc mockMvc;
 
     @Test
     @WithUserDetails("18508101366")

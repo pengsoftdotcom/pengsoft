@@ -29,6 +29,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class RoleApi extends TreeEntityApi<RoleService, Role, String> {
 
     @AuthorityChanged
+    @PostMapping("copy-authorities")
+    public void copyAuthorities(@RequestParam("source.id") final Role source,
+            @RequestParam("target.id") final Role target) {
+        getService().copyAuthorities(source, target);
+    }
+
+    @AuthorityChanged
     @PostMapping("grant-authorities")
     public void grantAuthorities(@RequestParam("role.id") final Role role,
             @RequestParam(value = "authority.id", defaultValue = "") final List<Authority> authorities) {

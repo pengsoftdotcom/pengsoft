@@ -4,17 +4,19 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.persistence.QueryHint;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import com.pengsoft.basedata.domain.Job;
+import com.pengsoft.basedata.domain.Organization;
 import com.pengsoft.basedata.domain.Person;
 import com.pengsoft.basedata.domain.QStaff;
 import com.pengsoft.basedata.domain.Staff;
 import com.pengsoft.support.repository.EntityRepository;
 import com.querydsl.core.types.dsl.StringPath;
 
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.data.querydsl.binding.QuerydslBindings;
 import org.springframework.stereotype.Repository;
@@ -46,21 +48,21 @@ public interface StaffRepository extends EntityRepository<QStaff, Staff, String>
     Optional<Staff> findOneByPersonAndJob(@NotNull Person person, @NotNull Job job);
 
     /**
-     * Returns an {@link Optional} of a {@link Staff} with given person id and
-     * primary true.
+     * Returns an {@link Optional} of a {@link Staff} with given person and primary
+     * true.
      *
-     * @param personId The id of {@link Staff}'s person
+     * @param person The {@link Staff}'s person
      */
     @QueryHints(value = @QueryHint(name = "org.hibernate.cacheable", value = "true"), forCounting = false)
-    Optional<Staff> findOneByPersonIdAndPrimaryTrue(@NotBlank String personId);
+    Optional<Staff> findOneByPersonAndPrimaryTrue(@NotNull Person person);
 
     /**
-     * Returns all {@link Staff}s with given person id.
+     * Returns all {@link Staff}s with given person.
      *
-     * @param personId The id of {@link Staff}'s person
+     * @param person The {@link Staff}'s person
      */
     @QueryHints(value = @QueryHint(name = "org.hibernate.cacheable", value = "true"), forCounting = false)
-    List<Staff> findAllByPersonId(@NotBlank String personId);
+    List<Staff> findAllByPerson(@NotNull Person person);
 
     /**
      * Returns all {@link Staff}s with given job ids
@@ -69,5 +71,33 @@ public interface StaffRepository extends EntityRepository<QStaff, Staff, String>
      */
     @QueryHints(value = @QueryHint(name = "org.hibernate.cacheable", value = "true"), forCounting = false)
     List<Staff> findAllByJobIdIn(@NotEmpty List<String> jobIds);
+
+    /**
+     * Returns all {@link Staff}s with given organization
+     * 
+     * @param organization
+     */
+    List<Staff> findAllByJobDepartmentOrganization(Organization organization);
+
+    /**
+     * Update the staff belonging.
+     * 
+     * @param staffs
+     * @param createdBy
+     * @param updatedBy
+     * @param controlledBy
+     * @param belongsTo
+     */
+    @Modifying
+    @Query("update Staff o set o.createdBy = ?2, o.updatedBy = ?3, o.controlledBy = ?4, o.belongsTo = ?5, o.updatedAt = now() where o in ?1")
+    void updateBelonging(@NotEmpty List<Staff> staffs, String createdBy, String updatedBy, String controlledBy,
+            String belongsTo);
+
+    /**
+     * Returns the total count with the given job.
+     * 
+     * @param job
+     */
+    long countByJob(@NotNull Job job);
 
 }

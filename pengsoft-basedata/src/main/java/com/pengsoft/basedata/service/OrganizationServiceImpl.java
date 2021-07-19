@@ -3,13 +3,21 @@ package com.pengsoft.basedata.service;
 import java.util.List;
 import java.util.Optional;
 
+import javax.inject.Inject;
+
 import com.pengsoft.basedata.domain.Organization;
 import com.pengsoft.basedata.domain.Person;
+import com.pengsoft.basedata.repository.DepartmentRepository;
+import com.pengsoft.basedata.repository.JobRepository;
 import com.pengsoft.basedata.repository.OrganizationRepository;
-import com.pengsoft.support.service.EntityServiceImpl;
+import com.pengsoft.basedata.repository.PostRepository;
+import com.pengsoft.basedata.repository.StaffRepository;
+import com.pengsoft.security.util.SecurityUtils;
+import com.pengsoft.support.service.TreeEntityServiceImpl;
 import com.pengsoft.support.util.EntityUtils;
 import com.pengsoft.support.util.StringUtils;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,8 +31,63 @@ import org.springframework.stereotype.Service;
  */
 @Primary
 @Service
-public class OrganizationServiceImpl extends EntityServiceImpl<OrganizationRepository, Organization, String>
+public class OrganizationServiceImpl extends TreeEntityServiceImpl<OrganizationRepository, Organization, String>
         implements OrganizationService {
+
+    @Inject
+    private PostRepository postRepository;
+
+    @Inject
+    private DepartmentRepository departmentRepository;
+
+    @Inject
+    private JobRepository jobRepository;
+
+    @Inject
+    private StaffRepository staffRepository;
+
+    @Override
+    public void setAdmin(Organization organization, Person admin) {
+        String createdBy = null;
+        String updatedBy = null;
+        String controlledBy = null;
+        String belongsTo = null;
+        if (admin != null) {
+            createdBy = admin.getUser().getId();
+            var optional = staffRepository.findOneByPersonAndPrimaryTrue(admin);
+            if (optional.isPresent()) {
+                var job = optional.get().getJob();
+                controlledBy = job.getDepartment().getId();
+                belongsTo = job.getDepartment().getOrganization().getId();
+            } else {
+                belongsTo = organization.getId();
+            }
+        } else {
+            createdBy = SecurityUtils.getUserId();
+        }
+        updatedBy = SecurityUtils.getUserId();
+        getRepository().setAdmin(organization, admin, createdBy, updatedBy, controlledBy, belongsTo);
+
+        final var posts = postRepository.findAllByOrganization(organization);
+        if (CollectionUtils.isNotEmpty(posts)) {
+            postRepository.updateBelonging(posts, createdBy, updatedBy, controlledBy, belongsTo);
+        }
+
+        final var departments = departmentRepository.findAllByOrganization(organization);
+        if (CollectionUtils.isNotEmpty(departments)) {
+            departmentRepository.updateBelonging(departments, createdBy, updatedBy, controlledBy, belongsTo);
+        }
+
+        final var jobs = jobRepository.findAllByDepartmentOrganization(organization);
+        if (CollectionUtils.isNotEmpty(jobs)) {
+            jobRepository.updateBelonging(jobs, createdBy, updatedBy, controlledBy, belongsTo);
+        }
+
+        final var staffs = staffRepository.findAllByJobDepartmentOrganization(organization);
+        if (CollectionUtils.isNotEmpty(staffs)) {
+            staffRepository.updateBelonging(staffs, createdBy, updatedBy, controlledBy, belongsTo);
+        }
+    }
 
     @Override
     public Organization save(final Organization organization) {
@@ -56,7 +119,7 @@ public class OrganizationServiceImpl extends EntityServiceImpl<OrganizationRepos
 
     @Override
     public List<Organization> findAllByAdmin(final Person admin) {
-        return getRepository().findAllByAdminId(admin.getId());
+        return getRepository().findAllByAdmin(admin);
     }
 
     @Override

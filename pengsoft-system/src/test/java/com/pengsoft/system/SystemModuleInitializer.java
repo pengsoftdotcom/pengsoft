@@ -18,13 +18,13 @@ import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
 @ActiveProfiles({ "support", "security", "system" })
-public class SystemModuleInitializer {
+class SystemModuleInitializer {
 
     @Inject
-    private RoleService service;
+    RoleService service;
 
     @Inject
-    private AuthorityFacade facade;
+    AuthorityFacade facade;
 
     @Test
     void initRolesAndAuthorities() {

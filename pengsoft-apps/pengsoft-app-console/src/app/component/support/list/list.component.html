@@ -9,31 +9,32 @@
         <div nz-col [nzSpan]="navData ? 20: 24">
             <nz-table #table nzBordered nzSize="middle" [nzLoading]="loading" [nzWidthConfig]="widthConfig"
                 [nzData]="listData" [nzTitle]="toolbar && toolbar.length > 0 ? toolbarTemplate : null"
-                [nzFooter]="treeable ? toolbarTemplate : null" [nzFrontPagination]="false" [nzShowPagination]="pageable"
-                [(nzPageIndex)]="pageData.page" [(nzPageSize)]="pageData.size" [nzTotal]="pageData.total"
-                [nzShowTotal]="rangeTemplate" nzShowQuickJumper (nzPageIndexChange)="pageChange.emit()"
-                nzShowSizeChanger [nzPageSizeOptions]="[20, 50, 100]" (nzPageSizeChange)="pageChange.emit()">
+                [nzFooter]="!pageData ? toolbarTemplate : null" [nzFrontPagination]="false"
+                [nzShowPagination]="pageable" [(nzPageIndex)]="pageData.page" [(nzPageSize)]="pageData.size"
+                [nzTotal]="pageData.total" [nzShowTotal]="rangeTemplate" nzShowQuickJumper
+                (nzPageIndexChange)="pageChange.emit()" nzShowSizeChanger [nzPageSizeOptions]="[20, 50, 100]"
+                (nzPageSizeChange)="pageChange.emit()">
                 <thead>
                     <tr *ngFor='let in of counter(depth); let i = index'>
-                        <th *ngIf="i === 0 && checkbox" id="checkbox" [attr.rowspan]="getRowspan()" colspan="1"
+                        <th *ngIf="i === 0 && checkbox" id="checkbox" [rowSpan]="getRowspan()" [colSpan]="1"
                             nzShowCheckbox [(nzChecked)]="allChecked" [nzIndeterminate]="indeterminate"
                             (nzCheckedChange)="checkAll($event)">
                         </th>
                         <ng-container *ngFor="let field of fieldsArray[i]">
                             <th id="dataColumn" *ngIf="field.list.visible" nzAlign="center"
-                                [attr.rowspan]="getRowspan(field, i)" [attr.colspan]="getColspan(field)"
+                                [rowSpan]="getRowspan(field, i)" [colSpan]="getColspan(field)"
                                 [nzShowSort]="field.list.sortable && !treeable"
                                 (nzSortOrderChange)="sortChange(field, $event)">
                                 {{field.list.label ? field.list.label :
                                 field.name}}
                             </th>
                         </ng-container>
-                        <th *ngIf="i === 0 && sortable" id="sortColumn" nzAlign="center" [attr.rowspan]="getRowspan()"
-                            colspan="1" nzAlign="center">
+                        <th *ngIf="i === 0 && sortable" id="sortColumn" nzAlign="center" [rowSpan]="getRowspan()"
+                            [colSpan]="1" nzAlign="center">
                             <a (click)="sequenceChange.emit()">排序</a>
                         </th>
                         <th *ngIf="i === 0 && action.length > 0" nzAlign="center" id="operationColumn"
-                            [attr.rowspan]="getRowspan()" colspan="1">
+                            [rowSpan]="getRowspan()" [colSpan]="1">
                             操作
                         </th>
                     </tr>

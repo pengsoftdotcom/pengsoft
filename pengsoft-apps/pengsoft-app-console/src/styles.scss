@@ -49,7 +49,7 @@
 }
 
 .edit {
-    .ant-tabs>.ant-tabs-nav {
+    .ant-tabs > .ant-tabs-nav {
         margin-bottom: 0;
     }
 
@@ -81,6 +81,6 @@ a.ant-btn {
     overflow-y: hidden;
 }
 
-.ant-drawer-body {
-    overflow-y: hidden;
-}
+// .ant-drawer-body {
+//     overflow-y: hidden;
+// }

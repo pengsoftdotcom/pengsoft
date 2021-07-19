@@ -11,11 +11,12 @@ import com.pengsoft.basedata.domain.Organization;
 import com.pengsoft.basedata.domain.Person;
 import com.pengsoft.basedata.service.OrganizationService;
 import com.pengsoft.basedata.service.PersonService;
+import com.pengsoft.security.domain.Role;
 import com.pengsoft.security.domain.User;
 import com.pengsoft.security.domain.UserRole;
 import com.pengsoft.security.service.RoleService;
 import com.pengsoft.security.service.UserService;
-import com.pengsoft.support.facade.EntityFacadeImpl;
+import com.pengsoft.support.facade.TreeEntityFacadeImpl;
 import com.pengsoft.support.util.EntityUtils;
 import com.pengsoft.support.util.StringUtils;
 
@@ -31,12 +32,8 @@ import org.springframework.stereotype.Service;
  * @since 1.0.0
  */
 @Service
-public class OrganizationFacadeImpl extends EntityFacadeImpl<OrganizationService, Organization, String>
+public class OrganizationFacadeImpl extends TreeEntityFacadeImpl<OrganizationService, Organization, String>
         implements OrganizationFacade {
-
-    public static final String BASEDATA_ORGANIZATION_ADMIN = "basedata_organization_admin";
-
-    public static final String ORGANIZATION_ADMIN = "organization_admin";
 
     @Inject
     private PersonService personService;
@@ -48,47 +45,39 @@ public class OrganizationFacadeImpl extends EntityFacadeImpl<OrganizationService
     private RoleService roleService;
 
     @Override
-    public Organization save(Organization target) {
-        Organization source = null;
+    public void setAdmin(Organization organization, Person targetAdmin) {
         Person sourceAdmin = null;
-        Person targetAdmin = target.getAdmin();
         User sourceUser = null;
         User targetUser = null;
-
         if (targetAdmin != null) {
             if (StringUtils.isBlank(targetAdmin.getId())) {
-                personService.findOneByMobile(targetAdmin.getMobile())
-                        .ifPresent(person -> getExceptions().entityNotExists(targetAdmin.getMobile()));
-                targetUser = userService.save(new User(targetAdmin.getMobile(), UUID.randomUUID().toString()));
-                userService.grantRoles(targetUser, List.of(roleService.findOneByCode(ORGANIZATION_ADMIN)
-                        .orElseThrow(() -> getExceptions().entityNotExists(ORGANIZATION_ADMIN))));
+                var mobile = targetAdmin.getMobile();
+                personService.findOneByMobile(mobile)
+                        .ifPresent(person -> getExceptions().constraintViolated("mobile", mobile));
+                targetUser = new User(targetAdmin.getMobile(), UUID.randomUUID().toString());
+                targetUser.setMobile(mobile);
+                targetUser = userService.saveWithoutValidation(targetUser);
                 targetAdmin.setUser(targetUser);
                 targetAdmin.setCreatedBy(targetUser.getId());
             } else {
-                sourceAdmin = personService.findOne(targetAdmin.getId())
-                        .orElseThrow(() -> getExceptions().entityNotExists(targetAdmin.getId()));
-                BeanUtils.copyProperties(sourceAdmin, targetAdmin, "id", "mobile", "user", "version");
+                var id = targetAdmin.getId();
+                sourceAdmin = personService.findOne(id).orElseThrow(() -> getExceptions().entityNotExists(id));
+                BeanUtils.copyProperties(targetAdmin, sourceAdmin);
+                targetAdmin = sourceAdmin;
             }
+            userService.grantRoles(targetAdmin.getUser(), List.of(roleService.findOneByCode(Role.ORG_ADMIN)
+                    .orElseThrow(() -> getExceptions().entityNotExists(Role.ORG_ADMIN))));
             personService.save(targetAdmin);
-        }
 
-        if (StringUtils.isNotBlank(target.getId())) {
-            source = findOne(target.getId()).orElseThrow(() -> getExceptions().entityNotExists(target.getId()));
-            sourceAdmin = source.getAdmin();
-            if (sourceAdmin != null && targetAdmin != null && EntityUtils.ne(sourceAdmin, targetAdmin)
-                    && countByAdmin(sourceAdmin) == 1) {
-                sourceUser = sourceAdmin.getUser();
-                sourceUser.getUserRoles().removeIf(userRole -> userRole.getRole().getCode().equals(ORGANIZATION_ADMIN));
-                userService.grantRoles(sourceUser,
-                        sourceUser.getUserRoles().stream().map(UserRole::getRole).collect(Collectors.toList()));
-            }
         }
-
-        target.setAdmin(targetAdmin);
-        if (targetUser != null) {
-            target.setCreatedBy(targetUser.getId());
+        sourceAdmin = organization.getAdmin();
+        if (sourceAdmin != null && EntityUtils.ne(sourceAdmin, targetAdmin) && countByAdmin(sourceAdmin) == 1) {
+            sourceUser = sourceAdmin.getUser();
+            sourceUser.getUserRoles().removeIf(userRole -> userRole.getRole().getCode().equals(Role.ORG_ADMIN));
+            userService.grantRoles(sourceUser,
+                    sourceUser.getUserRoles().stream().map(UserRole::getRole).collect(Collectors.toList()));
         }
-        return super.save(target);
+        getService().setAdmin(organization, targetAdmin);
     }
 
     @Override

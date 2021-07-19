@@ -35,7 +35,7 @@ export class EditComponent extends BaseComponent implements OnInit {
 
     drawerRef: NzDrawerRef;
 
-    constructor(private drawer: NzDrawerService) {
+    constructor(public drawer: NzDrawerService) {
         super();
         this.title = '编辑';
         this.width = '30%';

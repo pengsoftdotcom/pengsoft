@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
-import { deepCopy } from 'deep-copy-ts';
 import { NzTreeNodeOptions } from 'ng-zorro-antd/tree';
 import { SecurityService } from 'src/app/service/support/security.service';
 import { BaseComponent } from '../base.component';
@@ -85,7 +84,7 @@ export class ListComponent extends BaseComponent implements OnInit {
     }
 
     private initVisibleFields() {
-        let fields = deepCopy<Array<Field>>(this.fields);
+        let fields = JSON.parse(JSON.stringify(this.fields));
         while (fields.length > 0) {
             this.depth++;
             if (fields.filter(field => field.list.visible).length > 0) {

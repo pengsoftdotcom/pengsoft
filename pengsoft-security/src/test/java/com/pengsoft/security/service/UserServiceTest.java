@@ -10,10 +10,10 @@ import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
 @ActiveProfiles({ "support", "security" })
-public class UserServiceTest {
+class UserServiceTest {
 
     @Inject
-    private UserService service;
+    UserService service;
 
     @Test
     void saveWithoutValidation() {

@@ -29,6 +29,14 @@ public interface RoleService extends TreeEntityService<Role, String> {
     Role saveEntityAdmin(Class<? extends Entity<? extends Serializable>> entityClass);
 
     /**
+     * Copy the authorities of source role to the target role.
+     * 
+     * @param source The {@link Role} that will be copied.
+     * @param target The {@link Role} that will be copy to.
+     */
+    void copyAuthorities(@NotNull Role source, @NotNull Role target);
+
+    /**
      * Grant authorities.
      *
      * @param role        The {@link Role}

@@ -64,6 +64,7 @@ public class DefaultWebSecurityConfigurer extends WebSecurityConfigurerAdapter {
     protected void configure(final HttpSecurity http) throws Exception {
         http.csrf().disable()
             .authorizeRequests()
+                .antMatchers("/actuator/**").hasAnyAuthority("actuator")
                 .antMatchers(properties.getUrisPermitted().toArray(String[]::new)).permitAll()
                 .anyRequest().authenticated();
     }

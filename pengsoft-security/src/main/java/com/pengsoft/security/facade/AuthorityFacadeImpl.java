@@ -5,12 +5,14 @@ import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotBlank;
 
 import com.pengsoft.security.annotation.Authorized;
 import com.pengsoft.security.domain.Authority;
+import com.pengsoft.security.domain.Role;
 import com.pengsoft.security.service.AuthorityService;
 import com.pengsoft.security.service.RoleService;
 import com.pengsoft.security.util.SecurityUtils;
@@ -21,7 +23,6 @@ import com.pengsoft.support.exception.MissingConfigurationException;
 import com.pengsoft.support.facade.EntityFacadeImpl;
 import com.pengsoft.support.util.StringUtils;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
 import org.springframework.stereotype.Service;
@@ -46,69 +47,74 @@ public class AuthorityFacadeImpl extends EntityFacadeImpl<AuthorityService, Auth
 
     @Override
     public void saveEntityAdminAuthorities(final Class<? extends Entity<? extends Serializable>> entityClass) {
-        final var entityAdminCode = SecurityUtils.getEntityAdminCode(entityClass);
-        final var entityAdmin = roleService.findOneByCode(entityAdminCode).orElseThrow(
-                () -> new MissingConfigurationException("'" + entityClass.getName() + "' entity admin not found"));
+        final Class<?> apiClass = getApiClass(entityClass);
+        if (!apiClass.isAnnotationPresent(Authorized.class)) {
+            final var entityAdmin = getEntityAdmin(entityClass);
+            final var authorities = getEntityAuthorities(entityClass, apiClass);
+            roleService.grantAuthorities(entityAdmin, authorities);
+        }
+    }
 
+    private List<Authority> getEntityAuthorities(final Class<? extends Entity<? extends Serializable>> entityClass,
+            final Class<?> apiClass) {
+        final var authorityCodePrefix = SecurityUtils.getEntityAdminAuthorityCodePrefixFromEntityClass(entityClass)
+                + StringUtils.GLOBAL_SEPARATOR;
+        final var authorityCodes = new ArrayList<String>();
+        authorityCodes.addAll(getAuthorityCodesFromApi(apiClass, RequestMapping.class, authorityCodePrefix));
+        authorityCodes.addAll(getAuthorityCodesFromApi(apiClass, GetMapping.class, authorityCodePrefix));
+        authorityCodes.addAll(getAuthorityCodesFromApi(apiClass, PostMapping.class, authorityCodePrefix));
+        authorityCodes.addAll(getAuthorityCodesFromApi(apiClass, PutMapping.class, authorityCodePrefix));
+        authorityCodes.addAll(getAuthorityCodesFromApi(apiClass, DeleteMapping.class, authorityCodePrefix));
+        authorityCodes.removeAll(getAuthorityCodesNotNeeded(entityClass, apiClass, authorityCodePrefix));
+        return authorityCodes.stream().map(authorityCode -> {
+            final var optional = findOneByCode(authorityCode);
+            final Authority authority;
+            if (optional.isPresent()) {
+                authority = optional.get();
+            } else {
+                authority = save(new Authority(authorityCode));
+            }
+            return authority;
+        }).collect(Collectors.toList());
+    }
+
+    private Role getEntityAdmin(final Class<? extends Entity<? extends Serializable>> entityClass) {
+        final var entityAdminCode = SecurityUtils.getEntityAdminRoleCode(entityClass);
+        return roleService.findOneByCode(entityAdminCode).orElseThrow(
+                () -> new MissingConfigurationException("'" + entityClass.getName() + "' entity admin not found"));
+    }
+
+    private Class<?> getApiClass(final Class<? extends Entity<? extends Serializable>> entityClass) {
         final Class<?> apiClass;
         try {
             apiClass = Class.forName(RegExUtils.replaceFirst(entityClass.getName(), ".domain.", ".api.") + "Api");
         } catch (final ClassNotFoundException e) {
             throw new IllegalArgumentException("get api class from '" + entityClass.getName() + "' error", e);
         }
-        final var authorityCodePrefix = SecurityUtils.getEntityAdminAuthorityCodePrefixFromEntityClass(entityClass)
-                + StringUtils.GLOBAL_SEPARATOR;
-        final var authorities = new ArrayList<Authority>();
-        authorities.addAll(getAuthoritiesFromApi(apiClass, entityClass, RequestMapping.class, authorityCodePrefix));
-        authorities.addAll(getAuthoritiesFromApi(apiClass, entityClass, GetMapping.class, authorityCodePrefix));
-        authorities.addAll(getAuthoritiesFromApi(apiClass, entityClass, PostMapping.class, authorityCodePrefix));
-        authorities.addAll(getAuthoritiesFromApi(apiClass, entityClass, PutMapping.class, authorityCodePrefix));
-        authorities.addAll(getAuthoritiesFromApi(apiClass, entityClass, DeleteMapping.class, authorityCodePrefix));
-        roleService.grantAuthorities(entityAdmin, authorities);
+        return apiClass;
     }
 
-    private List<Authority> getAuthoritiesFromApi(final Class<?> apiClass,
-            final Class<? extends Entity<? extends Serializable>> entityClass,
+    private ArrayList<String> getAuthorityCodesNotNeeded(
+            final Class<? extends Entity<? extends Serializable>> entityClass, final Class<?> apiClass,
+            final String authorityCodePrefix) {
+        final var authorityCodes = new ArrayList<String>();
+        if (!Sortable.class.isAssignableFrom(entityClass)) {
+            authorityCodes.add(authorityCodePrefix + "sort");
+        }
+        if (!Enable.class.isAssignableFrom(entityClass)) {
+            authorityCodes.add(authorityCodePrefix + "enable");
+            authorityCodes.add(authorityCodePrefix + "disable");
+        }
+        authorityCodes.addAll(getAuthorityCodesFromApi(apiClass, Authorized.class, authorityCodePrefix));
+        return authorityCodes;
+    }
+
+    private List<String> getAuthorityCodesFromApi(final Class<?> apiClass,
             final Class<? extends Annotation> mappingClass, final String authorityCodePrefix) {
-        final var authorities = new ArrayList<Authority>();
-        if (apiClass != null && !apiClass.isAnnotationPresent(Authorized.class)) {
-            final var excludedAuthorityCodes = new ArrayList<String>();
-            if (!Sortable.class.isAssignableFrom(entityClass)) {
-                excludedAuthorityCodes.add(authorityCodePrefix + "sort");
-            }
-            if (!Enable.class.isAssignableFrom(entityClass)) {
-                excludedAuthorityCodes.add(authorityCodePrefix + "enable");
-                excludedAuthorityCodes.add(authorityCodePrefix + "disable");
-            }
-            MethodUtils.getMethodsListWithAnnotation(apiClass, mappingClass, true, false).stream()
-                    .filter(method -> !method.isAnnotationPresent(Authorized.class)).map(method -> {
-                        String authorityCode;
-                        try {
-                            authorityCode = authorityCodePrefix + ((String[]) MethodUtils
-                                    .invokeMethod(method.getAnnotation(mappingClass), "value"))[0];
-                            authorityCode = RegExUtils.replaceAll(authorityCode, StringUtils.HYPHEN,
-                                    StringUtils.UNDERLINE);
-                            authorityCode = authorityCode.replace("/", "");
-                        } catch (final Exception e) {
-                            throw new IllegalArgumentException(
-                                    "No value() method on mapping class or return value is empty");
-                        }
-                        return authorityCode;
-                    }).filter(authorityCode -> !CollectionUtils.containsAny(excludedAuthorityCodes, authorityCode))
-                    .distinct().forEach(authorityCode -> addAuthority(authorities, authorityCode));
-        }
-        return authorities;
+        return MethodUtils.getMethodsListWithAnnotation(apiClass, mappingClass, true, true).stream()
+                .map(method -> authorityCodePrefix + StringUtils.camelCaseToSnakeCase(method.getName(), false))
+                .collect(Collectors.toList());
 
-    }
-
-    private void addAuthority(final ArrayList<Authority> authorities, final String authorityCode) {
-        final var authority = new Authority(authorityCode);
-        final var optional = findOneByCode(authorityCode);
-        if (optional.isPresent()) {
-            authorities.add(optional.get());
-        } else {
-            authorities.add(save(authority));
-        }
     }
 
     @Override

@@ -56,10 +56,10 @@ export class PersonComponent extends EntityComponent<PersonService> {
                 },
                 filter: {}
             }),
-            FieldUtils.buildText({
+            FieldUtils.buildNumber({
                 code: 'mobile', name: '手机号码',
                 list: { width: 140, align: 'center' },
-                edit: { required: true, disabled: (form: any) => !!form.id },
+                edit: { required: true, input: { mode: 'tel' }, disabled: (form: any) => !!form.id },
                 filter: {}
             })
         ];

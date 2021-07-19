@@ -3,7 +3,6 @@ package com.pengsoft.basedata.api;
 import javax.inject.Inject;
 
 import com.pengsoft.basedata.domain.Job;
-import com.pengsoft.basedata.domain.Organization;
 import com.pengsoft.basedata.domain.StaffUserDetails;
 import com.pengsoft.basedata.service.StaffUserDetailsService;
 import com.pengsoft.security.annotation.AuthorityChanged;
@@ -33,12 +32,6 @@ public class StaffUserDetailsApi {
     @PostMapping("set-primary-job")
     public UserDetails setPrimaryJob(@RequestParam("id") final Job job) {
         return service.setPrimaryJob(job);
-    }
-
-    @AuthorityChanged
-    @PostMapping("set-organization")
-    public UserDetails setOrganization(@RequestParam("id") final Organization organization) {
-        return service.setOrganization(organization);
     }
 
 }

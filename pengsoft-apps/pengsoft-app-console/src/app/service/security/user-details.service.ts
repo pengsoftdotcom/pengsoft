@@ -48,9 +48,15 @@ export class UserDetailsService extends BaseService {
         this.http.request('POST', url, options);
     }
 
-    setOrganization(organization: any, options: HttpOptions): void {
+    setPrimaryOrganization(organization: any, options: HttpOptions): void {
         options.params = { id: organization.id };
-        const url = this.getApiPath('set-organization');
+        const url = this.getApiPath('set-primary-organization');
+        this.http.request('POST', url, options);
+    }
+
+    savePerson(person: any, options: HttpOptions): void {
+        options.body = Object.assign({}, person)
+        const url = this.getApiPath('save-person');
         this.http.request('POST', url, options);
     }
 

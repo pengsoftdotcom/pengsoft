@@ -242,23 +242,13 @@ export class FieldUtils {
                     field.edit[key] = edit[key];
                 }
             }
-            if (edit.label) {
-                field = this.getLabel(field, edit.label);
-            } else {
-                field = this.getLabel(field);
-            }
-            if (edit.input) {
-                field = this.getInput(field, edit.input);
-            } else {
-                field = this.getInput(field);
-            }
+            field = edit.label ? this.getLabel(field, edit.label) : this.getLabel(field);
+            field = edit.input ? this.getInput(field, edit.input) : this.getInput(field);
         } else {
             field = this.getLabel(field);
             field = this.getInput(field);
         }
-        if (!field.edit.code) {
-            field.edit.code = field.code;
-        }
+        field.edit.code = !field.edit.code ? field.code : null;
         if (field.filter) {
             const label = Object.assign({}, field.edit.label);
             const input = Object.assign({}, field.edit.input);

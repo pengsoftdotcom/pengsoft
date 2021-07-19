@@ -6,6 +6,9 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalRef, NzModalService } from 'ng-zorro-antd/modal';
 import { environment } from 'src/environments/environment';
 import { ChangePasswordComponent } from './component/modal/change-password/change-password.component';
+import { Field } from './component/support/form-item/field';
+import { PersonComponent } from './pages/basedata/person/person.component';
+import { DictionaryItemService } from './service/basedata/dictionary-item.service';
 import { UserDetailsService } from './service/security/user-details.service';
 import { SecurityService } from './service/support/security.service';
 
@@ -22,34 +25,77 @@ export class AppComponent {
 
     userDetails: any = { user: {} };
 
-    @ViewChild('jobs', { static: true }) public jobs: TemplateRef<any>;
+    @ViewChild('jobsTemplate', { static: true }) jobsTemplate: TemplateRef<any>;
 
     switchJobModal: NzModalRef;
 
-    @ViewChild('roles', { static: true }) public roles: TemplateRef<any>;
+    switchJobVisible = false;
+
+    switchJobDisabled = false;
+
+    @ViewChild('rolesTemplate', { static: true }) rolesTemplate: TemplateRef<any>;
 
     switchRoleModal: NzModalRef;
 
-    @ViewChild('organizations', { static: true }) organizations: TemplateRef<any>;
+    switchRoleVisible = false;
+
+    switchRoleDisabled = false;
+
+    @ViewChild('organizationsTemplate', { static: true }) organizationsTemplate: TemplateRef<any>;
 
     switchOrganizationModal: NzModalRef;
 
+    switchOrganizationVisible = false;
+
+    switchOrganizationDisabled = false;
+
+    @ViewChild('editPersonTemplate', { static: true }) editPersonTemplate: TemplateRef<any>;
+
+    editPersonModal: NzModalRef;
+
+    personFields: Array<Field> = [];
+
+    errors: any = {};
+
     constructor(
+        private dictionaryItem: DictionaryItemService,
         private title: Title,
         private router: Router,
         private location: Location,
+        private security: SecurityService,
         private message: NzMessageService,
         private modal: NzModalService,
-        private security: SecurityService,
         private userDetailsService: UserDetailsService
     ) {
+        if (security.isNotAuthenticated()) {
+            this.signIn();
+        }
+
         this.title.setTitle(environment.title);
         this.menus = this.router.config.filter(
             (route) => route.data || route.children
         );
         this.userDetails = this.security.userDetails;
-        if (security.isNotAuthenticated()) {
-            this.signIn();
+
+        if (this.userDetails.jobs && this.userDetails.jobs.length > 0) {
+            this.switchJobVisible = true;
+            if (this.userDetails.jobs.length === 1) {
+                this.switchJobDisabled = true;
+            }
+        }
+
+        if (!this.userDetails.jobs && this.userDetails.primaryRole && this.userDetails.primaryRole.code !== 'org_admin') {
+            this.switchRoleVisible = true;
+            if (this.userDetails.roles.length === 1) {
+                this.switchRoleDisabled = true;
+            }
+        }
+
+        if (this.userDetails.primaryRole && this.userDetails.primaryRole.code === 'org_admin') {
+            this.switchOrganizationVisible = true;
+            if (this.userDetails.organizations.length === 1) {
+                this.switchOrganizationDisabled = true;
+            }
         }
     }
 
@@ -72,7 +118,25 @@ export class AppComponent {
     }
 
     editPerson(): void {
-        this.message.info('暂未开放，敬请期待');
+        PersonComponent.prototype.dictionaryItem = this.dictionaryItem;
+        PersonComponent.prototype.initFields();
+        this.personFields = PersonComponent.prototype.fields;
+        this.editPersonModal = this.modal.create({
+            nzTitle: '编辑基本信息',
+            nzContent: this.editPersonTemplate,
+            nzOnOk: () =>
+                new Promise((resolve) => {
+                    this.userDetailsService.savePerson(this.userDetails.person, {
+                        errors: this.errors,
+                        success: (res: any) => {
+                            this.userDetails = res;
+                            this.message.info('保存成功', { nzDuration: 1000 })
+                                .onClose.subscribe(() => resolve(true));
+                        },
+                        failure: () => resolve(false)
+                    });
+                })
+        });
     }
 
     switchRole(): void {
@@ -80,7 +144,7 @@ export class AppComponent {
             nzStyle: { top: '30%' },
             nzWidth: 450,
             nzTitle: '切换角色',
-            nzContent: this.roles,
+            nzContent: this.rolesTemplate,
             nzFooter: null,
         });
     }
@@ -90,24 +154,25 @@ export class AppComponent {
             nzStyle: { top: '30%' },
             nzWidth: 450,
             nzTitle: '切换职位',
-            nzContent: this.jobs,
+            nzContent: this.jobsTemplate,
             nzFooter: null,
         });
     }
 
     switchOrganization(): void {
-        this.switchJobModal = this.modal.create({
+        this.switchOrganizationModal = this.modal.create({
             nzStyle: { top: '30%' },
             nzWidth: 450,
             nzTitle: '切换机构',
-            nzContent: this.organizations,
+            nzContent: this.organizationsTemplate,
             nzFooter: null,
         });
     }
 
-    primaryRoleChanged(): void {
+    roleSwitched(): void {
         this.userDetailsService.setPrimaryRole(this.userDetails.primaryRole, {
             success: (res: any) => {
+                this.userDetails = res;
                 this.security.userDetails = res;
                 this.message
                     .info('设置成功', { nzDuration: 1000 })
@@ -117,9 +182,10 @@ export class AppComponent {
         });
     }
 
-    primaryJobChanged(): void {
+    jobSwitched(): void {
         this.userDetailsService.setPrimaryJob(this.userDetails.primaryJob, {
             success: (res: any) => {
+                this.userDetails = res;
                 this.security.userDetails = res;
                 this.message
                     .info('设置成功', { nzDuration: 1000 })
@@ -129,13 +195,14 @@ export class AppComponent {
         });
     }
 
-    primaryOrganizationChanged(): void {
-        this.userDetailsService.setOrganization(this.userDetails.organization, {
+    organizationSwitched(): void {
+        this.userDetailsService.setPrimaryOrganization(this.userDetails.primaryOrganization, {
             success: (res: any) => {
+                this.userDetails = res;
                 this.security.userDetails = res;
                 this.message
                     .info('设置成功，页面即将刷新', { nzDuration: 1000 })
-                    .onClose.subscribe(() => window.location.reload());
+                    .onClose.subscribe(() => this.switchOrganizationModal.close());
             },
             failure: () => this.message.error('设置失败'),
         });
@@ -155,15 +222,15 @@ export class AppComponent {
                         failure: () => resolve(false),
                         after: () => (component.loading = false),
                     });
-                }),
+                })
         });
     }
 
-    public signIn(): void {
+    signIn(): void {
         this.router.navigateByUrl('/sign-in');
     }
 
-    public signOut(): void {
+    signOut(): void {
         this.modal.confirm({
             nzTitle: '确定要退出登录吗？',
             nzOnOk: () => {
@@ -183,7 +250,7 @@ export class AppComponent {
     get name(): string {
         let name = this.userDetails.user.username;
         if (this.userDetails.person) {
-            name = this.userDetails.person.nickname;
+            name = this.userDetails.person.name;
         }
         return name;
     }

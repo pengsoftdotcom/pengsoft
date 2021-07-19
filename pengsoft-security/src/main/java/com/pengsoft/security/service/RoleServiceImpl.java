@@ -46,9 +46,9 @@ public class RoleServiceImpl extends TreeEntityServiceImpl<RoleRepository, Role,
     @Override
     public Role saveEntityAdmin(final Class<? extends Entity<? extends Serializable>> entityClass) {
         final var admin = createRoleIfNotExists(null, Role.ADMIN);
-        final var moduleAdminCode = SecurityUtils.getModuleAdminCode(entityClass);
+        final var moduleAdminCode = SecurityUtils.getModuleAdminRoleCode(entityClass);
         final var moduleAdmin = createRoleIfNotExists(admin, moduleAdminCode);
-        final var entityAdminCode = SecurityUtils.getEntityAdminCode(entityClass);
+        final var entityAdminCode = SecurityUtils.getEntityAdminRoleCode(entityClass);
         return createRoleIfNotExists(moduleAdmin, entityAdminCode);
     }
 
@@ -59,6 +59,13 @@ public class RoleServiceImpl extends TreeEntityServiceImpl<RoleRepository, Role,
         } else {
             return optional.get();
         }
+    }
+
+    @Override
+    public void copyAuthorities(Role source, Role target) {
+        final var authorities = source.getRoleAuthorities().stream().map(RoleAuthority::getAuthority)
+                .collect(Collectors.toList());
+        grantAuthorities(target, authorities);
     }
 
     @Override

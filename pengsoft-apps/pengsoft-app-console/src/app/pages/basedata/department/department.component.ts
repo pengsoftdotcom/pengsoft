@@ -1,4 +1,3 @@
-import { Location } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalService } from 'ng-zorro-antd/modal';
@@ -36,17 +35,16 @@ export class DepartmentComponent extends TreeEntityComponent<DepartmentService> 
     organization: any;
 
     constructor(
-        private location: Location,
         private security: SecurityService,
         public entity: DepartmentService,
         public modal: NzModalService,
         public message: NzMessageService
     ) {
         super(entity, modal, message);
-        this.organization = this.security.userDetails.organization;
+        this.organization = this.security.userDetails.primaryOrganization;
     }
 
-    get params(): any {
+    get parentQueryParams(): any {
         if (this.organization) {
             return { 'organization.id': this.organization.id };
         }
@@ -63,7 +61,7 @@ export class DepartmentComponent extends TreeEntityComponent<DepartmentService> 
 
     initListToolbar(): void {
         super.initListToolbar();
-        if (!this.security.userDetails.organization) {
+        if (!this.security.userDetails.primaryOrganization) {
             this.listToolbar.splice(2, 0, {
                 name: '切换机构',
                 type: 'link',

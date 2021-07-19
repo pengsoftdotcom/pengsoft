@@ -50,6 +50,11 @@ public class Role extends TreeEntityImpl<Role> implements Codeable {
      */
     public static final String USER = "user";
 
+    /**
+     * Role code: organization contact
+     */
+    public static final String ORG_ADMIN = "org_admin";
+
     private static final long serialVersionUID = 8899680261707632937L;
 
     @NotBlank

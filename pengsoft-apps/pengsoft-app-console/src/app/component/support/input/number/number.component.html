@@ -1,3 +1,4 @@
-<nz-input-number [(ngModel)]="form[edit.code]" (ngModelChange)="modelChange($event)" type="password" [nzPlaceHolder]="placeholder"
-    [nzDisabled]="disabled">
+<nz-input-number [(ngModel)]="form[edit.code]" (ngModelChange)="modelChange($event)" type="password"
+    [nzPlaceHolder]="placeholder" [nzDisabled]="disabled" [nzInputMode]="edit.input.mode" [nzMin]="edit.input.min"
+    [nzMax]="edit.input.max">
 </nz-input-number>

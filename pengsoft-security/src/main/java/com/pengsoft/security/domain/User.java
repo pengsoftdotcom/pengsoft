@@ -2,10 +2,12 @@ package com.pengsoft.security.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.pengsoft.security.validation.Password;
 import com.pengsoft.security.validation.Username;
 import com.pengsoft.support.domain.Enable;
 import com.pengsoft.support.domain.EntityImpl;
+import com.pengsoft.security.json.MobileJsonSerializer;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -52,6 +54,7 @@ public class User extends EntityImpl implements Enable {
     @Column(updatable = false)
     private String username;
 
+    @JsonSerialize(using = MobileJsonSerializer.class)
     @Size(max = 255)
     private String mobile;
 

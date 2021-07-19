@@ -4,29 +4,18 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
-import com.pengsoft.basedata.domain.Job;
-import com.pengsoft.basedata.domain.Organization;
 import com.pengsoft.basedata.domain.OwnedExt;
-import com.pengsoft.basedata.domain.Person;
-import com.pengsoft.basedata.domain.Staff;
 import com.pengsoft.basedata.repository.OwnedExtRepository;
-import com.pengsoft.basedata.service.JobService;
-import com.pengsoft.basedata.service.StaffService;
 import com.pengsoft.basedata.util.SecurityUtilsExt;
 import com.pengsoft.security.aspect.ApiMethodArgumentsHandler;
 import com.pengsoft.security.aspect.DefaultApiMethodArgumentsHandler;
 import com.pengsoft.security.domain.Owned;
-import com.pengsoft.security.domain.Role;
-import com.pengsoft.security.domain.User;
-import com.pengsoft.security.util.SecurityUtils;
 import com.pengsoft.support.domain.Entity;
 import com.pengsoft.support.exception.MissingConfigurationException;
 import com.pengsoft.support.util.QueryDslUtils;
 import com.pengsoft.support.util.StringUtils;
-import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.StringPath;
@@ -46,79 +35,56 @@ import org.springframework.context.annotation.Primary;
 public class AdvancedApiMethodArgumentsHandler<T extends Entity<ID>, ID extends Serializable>
         extends DefaultApiMethodArgumentsHandler<T, ID> {
 
-    public static final String ORGANIZATION_ADMIN = "organization_admin";
-
-    @Inject
-    private JobService jobService;
-
-    @Inject
-    private StaffService staffService;
-
     public AdvancedApiMethodArgumentsHandler(final ApplicationContext applicationContext) {
         super(applicationContext);
     }
 
     @Override
     public Predicate replace(final Class<T> entityClass, final Predicate predicate) {
-        if (SecurityUtilsExt.hasAnyRole(Role.ADMIN, getModuleAdminRoleCode(entityClass),
-                getEntityAdminRoleCode(entityClass))) {
+        if (isAdmin(entityClass)) {
             return predicate;
         } else {
             if (OwnedExt.class.isAssignableFrom(entityClass)) {
-                final var result = new BooleanBuilder();
-                Organization organization = null;
-                if (isOrganizationAdmin()) {
-                    organization = SecurityUtilsExt.getOrganization();
-                } else {
-                    organization = SecurityUtilsExt.getOrganization();
-                    final var job = SecurityUtilsExt.getPrimaryJob();
-                    if (job != null) {
-                        result.or(getCreatedByPredicate(entityClass, job));
+                final var primaryJob = SecurityUtilsExt.getPrimaryJob();
+                if (primaryJob != null) {
+                    if (primaryJob.isOrganizationChief()) {
+                        return QueryDslUtils.merge(predicate,
+                                getBelongsToPredicate(entityClass, SecurityUtilsExt.getPrimaryOrganizationId()));
                     }
-                }
-                result.or(getBelongsToPredicate(entityClass, organization));
-                if (QueryDslUtils.isNotBlank(result)) {
-                    return QueryDslUtils.merge(predicate, result);
+                    if (primaryJob.isDepartmentChief()) {
+                        return QueryDslUtils.merge(predicate,
+                                getControlledByPredicate(entityClass, SecurityUtilsExt.getPrimaryDepartmentId()));
+                    }
                 }
             }
             return super.replace(entityClass, predicate);
         }
     }
 
-    private BooleanExpression getBelongsToPredicate(final Class<T> entityClass, final Organization organization) {
+    private BooleanExpression getBelongsToPredicate(final Class<T> entityClass, final String primaryOrganizationId) {
         final var belongsToPath = (StringPath) QueryDslUtils.getPath(entityClass, "belongsTo");
-        return belongsToPath.eq(organization.getId());
+        return belongsToPath.eq(primaryOrganizationId);
     }
 
-    private BooleanExpression getCreatedByPredicate(final Class<T> entityClass, final Job job) {
-        final var jobs = jobService
-                .findAllByParentIdsStartsWith(job.getParentIds() + StringUtils.GLOBAL_SEPARATOR + job.getId());
-        jobs.add(job);
-        final var staffs = staffService.findAllByJobIn(jobs);
-        final var createdByPath = (StringPath) QueryDslUtils.getPath(entityClass, "createdBy");
-        final var createdBy = staffs.stream().map(Staff::getPerson).map(Person::getUser).map(User::getId).distinct()
-                .collect(Collectors.toList());
-        return createdByPath.in(createdBy);
-    }
-
-    private boolean isOrganizationAdmin() {
-        final var role = SecurityUtils.getCurrentRole();
-        return role != null && StringUtils.equals(ORGANIZATION_ADMIN, role.getCode());
+    private BooleanExpression getControlledByPredicate(final Class<T> entityClass, final String primaryDepartmentId) {
+        final var controlledBy = (StringPath) QueryDslUtils.getPath(entityClass, "controlledBy");
+        return controlledBy.eq(primaryDepartmentId);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public boolean check(final Owned entity) {
         final var id = ((T) entity).getId();
-        if (id != null && OwnedExt.class.isAssignableFrom(entity.getClass())
-                && SecurityUtilsExt.getPrimaryJob() != null) {
-            final var job = SecurityUtilsExt.getPrimaryJob();
-            if (job.isOrganizationChief()
-                    && StringUtils.equals(SecurityUtilsExt.getOrganizationId(), ((OwnedExt) entity).getBelongsTo())) {
+        final var primaryJob = SecurityUtilsExt.getPrimaryJob();
+        if (id != null && OwnedExt.class.isAssignableFrom(entity.getClass()) && primaryJob != null) {
+            final var primaryDepartmentId = SecurityUtilsExt.getPrimaryDepartmentId();
+            final var controlledBy = ((OwnedExt) entity).getControlledBy();
+            if (primaryJob.isDepartmentChief() && StringUtils.equals(primaryDepartmentId, controlledBy)) {
                 return true;
             }
-            if (job.isDepartmentChief() && StringUtils.equals(SecurityUtilsExt.getOrganizationId(),
-                    ((OwnedExt) entity).getControlledBy())) {
+            final var primaryOrganizationId = SecurityUtilsExt.getPrimaryOrganizationId();
+            final var belongsTo = ((OwnedExt) entity).getBelongsTo();
+            if (primaryJob.isOrganizationChief() && StringUtils.equals(primaryOrganizationId, belongsTo)) {
                 return true;
             }
         }
@@ -127,24 +93,23 @@ public class AdvancedApiMethodArgumentsHandler<T extends Entity<ID>, ID extends 
 
     @Override
     public boolean check(final Class<T> entityClass, final Collection<ID> ids) {
-        if (SecurityUtilsExt.hasAnyRole(Role.ADMIN, getModuleAdminRoleCode(entityClass),
-                getEntityAdminRoleCode(entityClass))) {
+        if (isAdmin(entityClass)) {
             return true;
         } else {
-            if (OwnedExt.class.isAssignableFrom(entityClass) && SecurityUtilsExt.getPrimaryJob() != null) {
+            final var primaryJob = SecurityUtilsExt.getPrimaryJob();
+            if (OwnedExt.class.isAssignableFrom(entityClass) && primaryJob != null) {
                 final var repository = (OwnedExtRepository) getRepositories().getRepositoryFor(entityClass).orElseThrow(
                         () -> new MissingConfigurationException("no repository for class: " + entityClass.getName()));
-                final var job = SecurityUtilsExt.getPrimaryJob();
                 var matched = false;
                 final var stringIds = ids.stream().map(String.class::cast).collect(Collectors.toList());
-                if (job.isOrganizationChief()) {
-                    matched = repository.countByIdInAndBelongsTo(stringIds, SecurityUtilsExt.getOrganizationId()) == ids
-                            .size();
+                if (primaryJob.isOrganizationChief()) {
+                    matched = repository.countByIdInAndBelongsTo(stringIds,
+                            SecurityUtilsExt.getPrimaryOrganizationId()) == ids.size();
                 }
 
-                if (job.isDepartmentChief()) {
+                if (primaryJob.isDepartmentChief()) {
                     matched = repository.countByIdInAndControlledBy(stringIds,
-                            SecurityUtilsExt.getDepartmentId()) == ids.size();
+                            SecurityUtilsExt.getPrimaryDepartmentId()) == ids.size();
                 }
 
                 if (matched) {

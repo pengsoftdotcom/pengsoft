@@ -42,7 +42,7 @@ public class HandleApiDataAuthorityAspect<T extends Entity<ID>, ID extends Seria
         var method = ((MethodSignature) jp.getSignature()).getMethod();
         method = ClassUtils.getPublicMethod(apiClass, jp.getSignature().getName(), method.getParameterTypes());
         final var args = jp.getArgs();
-        if (apiClass.getAnnotation(Authorized.class) == null && method.getAnnotation(Authorized.class) == null
+        if (apiClass.isAnnotationPresent(Authorized.class) && method.isAnnotationPresent(Authorized.class)
                 && SecurityUtils.getUserDetails() != null && Owned.class.isAssignableFrom(entityClass)) {
             final var length = args.length;
             for (var i = 0; i < length; i++) {

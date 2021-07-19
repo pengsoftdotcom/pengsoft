@@ -39,29 +39,29 @@ public class SecurityUtilsExt {
     /**
      * Returns current user's department.
      */
-    public static Department getDepartment() {
-        return Optional.ofNullable(SecurityUtils.get("department", Department.class)).orElse(null);
+    public static Department getPrimaryDepartment() {
+        return Optional.ofNullable(SecurityUtils.get("primaryDepartment", Department.class)).orElse(null);
     }
 
     /**
-     * Returns current user's department id.
+     * Returns current user's primary department id.
      */
-    public static String getDepartmentId() {
-        return Optional.ofNullable(getDepartment()).map(Department::getId).orElse(null);
+    public static String getPrimaryDepartmentId() {
+        return Optional.ofNullable(getPrimaryDepartment()).map(Department::getId).orElse(null);
     }
 
     /**
-     * Returns current user's organization.
+     * Returns current user's primary organization.
      */
-    public static Organization getOrganization() {
-        return Optional.ofNullable(SecurityUtils.get("organization", Organization.class)).orElse(null);
+    public static Organization getPrimaryOrganization() {
+        return Optional.ofNullable(SecurityUtils.get("primaryOrganization", Organization.class)).orElse(null);
     }
 
     /**
-     * Returns current user's organization id.
+     * Returns current user's primary organization id.
      */
-    public static String getOrganizationId() {
-        return Optional.ofNullable(getOrganization()).map(Organization::getId).orElse(null);
+    public static String getPrimaryOrganizationId() {
+        return Optional.ofNullable(getPrimaryOrganization()).map(Organization::getId).orElse(null);
     }
 
     public static boolean hasAnyRole(final String... roleCodes) {

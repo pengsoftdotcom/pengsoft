@@ -9,13 +9,13 @@ import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
 @ActiveProfiles({ "support", "security", "system", "basedata" })
-public class OrganizationRepositoryTest {
+class OrganizationRepositoryTest {
 
     @Inject
-    private OrganizationRepository organizationRepository;
+    OrganizationRepository organizationRepository;
 
     @Inject
-    private PersonRepository personRepository;
+    PersonRepository personRepository;
 
     @Test
     void findPageExcludeConsumerBySupplier() {
@@ -27,6 +27,11 @@ public class OrganizationRepositoryTest {
     void findPageExcludeSupplierByConsumer() {
         organizationRepository.findOneByCode("001").ifPresent(organization -> organizationRepository
                 .findPageOfAvailableSuppliers(organization, PageRequest.of(0, 20)));
+    }
+
+    @Test
+    void findAllByAdmin() {
+        personRepository.findOneByMobile("18508101366").ifPresent(organizationRepository::findAllByAdmin);
     }
 
     @Test

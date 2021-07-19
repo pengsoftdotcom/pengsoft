@@ -2,7 +2,8 @@ package com.pengsoft.basedata.facade;
 
 import javax.inject.Inject;
 
-import com.pengsoft.basedata.service.PersonService;
+import com.pengsoft.basedata.domain.Organization;
+import com.pengsoft.system.service.DictionaryItemService;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,27 +12,32 @@ import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
 @ActiveProfiles({ "support", "security", "system", "basedata" })
-public class OrganizationFacadeTest {
+class OrganizationFacadeTest {
 
     @Inject
-    private OrganizationFacade facade;
+    OrganizationFacade facade;
 
     @Inject
-    private PersonService service;
+    DictionaryItemService dictionaryItemService;
 
     @Test
     @WithUserDetails("admin")
     void save() {
-        facade.findOneByCode("001")
-                .ifPresent(organization -> service.findOneByMobile("18508101366").ifPresent(admin -> {
-                    organization.setAdmin(admin);
-                    facade.save(organization);
-                }));
+        final var organization = new Organization();
+        organization.setCode("001");
+        organization.setName("重庆鹏软科技有限公司");
+        dictionaryItemService.findOne("98fdc3e6-567c-48b6-9c82-ffe7f20b6717").ifPresent(organization::setCategory);
+        facade.save(organization);
+    }
+
+    @Test
+    @WithUserDetails("admin")
+    void setAdmin() {
+        facade.findOneByCode("001").ifPresent(organization -> facade.setAdmin(organization, null));
     }
 
     @Test
     void delete() {
         facade.delete(facade.findAll(null, null));
     }
-
 }

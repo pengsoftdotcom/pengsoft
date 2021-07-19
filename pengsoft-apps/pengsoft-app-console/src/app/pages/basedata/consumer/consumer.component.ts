@@ -43,7 +43,7 @@ export class ConsumerComponent extends EntityComponent<SupplierConsumerService> 
         public drawer: NzDrawerService
     ) {
         super(entity, modal, message);
-        this.supplier = this.security.userDetails.organization;
+        this.supplier = this.security.userDetails.primaryOrganization;
     }
 
     initFields(): void {
@@ -68,7 +68,7 @@ export class ConsumerComponent extends EntityComponent<SupplierConsumerService> 
 
     initListToolbar(): void {
         super.initListToolbar();
-        if (!this.security.userDetails.organization) {
+        if (!this.security.userDetails.primaryOrganization) {
             this.listToolbar.splice(2, 0, {
                 name: '切换机构',
                 type: 'link',

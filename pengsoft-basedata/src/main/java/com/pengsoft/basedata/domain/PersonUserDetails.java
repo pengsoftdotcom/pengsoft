@@ -1,6 +1,6 @@
 package com.pengsoft.basedata.domain;
 
-import java.util.Collection;
+import java.util.List;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.pengsoft.basedata.json.OrganizationCollectionJsonSerializer;
@@ -30,20 +30,19 @@ public class PersonUserDetails extends DefaultUserDetails {
     private Person person;
 
     @JsonSerialize(using = OrganizationCollectionJsonSerializer.class)
-    private Collection<Organization> organizations;
+    private List<Organization> organizations;
 
     @JsonSerialize(using = OrganizationJsonSerializer.class)
-    private Organization organization;
+    private Organization primaryOrganization;
 
-    public PersonUserDetails(final Person person, final Collection<Organization> organizations,
-            final Collection<Role> roles, final Role primaryRole,
-            final Collection<? extends GrantedAuthority> authorities) {
+    public PersonUserDetails(final Person person, final List<Organization> organizations, final List<Role> roles,
+            final Role primaryRole, final List<GrantedAuthority> authorities) {
         super(person.getUser(), roles, primaryRole, authorities);
         this.person = person;
         this.organizations = organizations;
-        if (primaryRole != null && primaryRole.getCode().equals("organization_admin")
+        if (primaryRole != null && primaryRole.getCode().equals(Role.ORG_ADMIN)
                 && CollectionUtils.isNotEmpty(organizations)) {
-            this.organization = organizations.iterator().next();
+            this.primaryOrganization = organizations.iterator().next();
         }
     }
 

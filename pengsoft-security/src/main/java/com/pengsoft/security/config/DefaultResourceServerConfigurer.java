@@ -49,6 +49,7 @@ public class DefaultResourceServerConfigurer extends ResourceServerConfigurerAda
     public void configure(HttpSecurity http) throws Exception {
         http.csrf().disable()
             .authorizeRequests()
+                .antMatchers("/actuator/**").hasAnyAuthority("actuator")
                 .antMatchers(properties.getUrisPermitted().toArray(String[]::new)).permitAll()
                 .anyRequest().authenticated();
     }

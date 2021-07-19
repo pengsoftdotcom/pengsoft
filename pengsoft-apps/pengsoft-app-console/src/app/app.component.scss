@@ -36,23 +36,21 @@
     line-height: 64px;
     background: #001529;
     transition: all 0.3s;
-}
-
-.sidebar-logo img {
-    display: inline-block;
-    height: 32px;
-    width: 32px;
-    vertical-align: middle;
-}
-
-.sidebar-logo h1 {
-    display: inline-block;
-    margin: 0 0 0 20px;
-    color: #fff;
-    font-weight: 600;
-    font-size: 18px;
-    font-family: Avenir, Helvetica Neue, Arial, Helvetica, sans-serif;
-    vertical-align: middle;
+    img {
+        display: inline-block;
+        height: 32px;
+        width: 32px;
+        vertical-align: middle;
+    }
+    h1 {
+        display: inline-block;
+        margin: 0 0 0 20px;
+        color: #fff;
+        font-weight: 600;
+        font-size: 18px;
+        font-family: Avenir, Helvetica Neue, Arial, Helvetica, sans-serif;
+        vertical-align: middle;
+    }
 }
 
 nz-header {
@@ -86,29 +84,33 @@ nz-content {
 }
 
 .person {
-    padding: 8px 16px;
-}
-
-.person .name {
-    margin: 0 0 0 8px;
-    color: #666666;
-}
-
-.person .menu {
-    margin: 8px 0 0 0;
-}
-
-.person .menu a {
-    margin: 0 8px;
-}
-
-.user-menu {
-    font-size: 13px;
-}
-
-.sign-out {
-    text-align: center;
-    color: #ff4d4f;
+    padding: 0;
+    .name {
+        padding: 8px 16px;
+        background: #efefef;
+        text-align: center;
+        color: #666666;
+        display: block;
+        span {
+            display: block;
+            color: #aaaaaa;
+        }
+    }
+    .menu {
+        padding: 6px;
+        a {
+            margin: 0 18px;
+        }
+    }
+    .sign-out {
+        padding: 6px;
+        color: #ff4d4f;
+        text-align: center;
+        display: block;
+    }
+    .ant-dropdown-menu-item-divider {
+        margin: 0;
+    }
 }
 
 [nz-radio] {

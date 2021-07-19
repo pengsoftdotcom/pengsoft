@@ -1,4 +1,5 @@
 import { Component, ViewChild } from '@angular/core';
+import { NzDrawerRef, NzDrawerService } from 'ng-zorro-antd/drawer';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { Button } from 'src/app/component/support/button/button';
@@ -9,6 +10,7 @@ import { TreeEntityComponent } from 'src/app/component/support/tree-entity.compo
 import { AuthorityService } from 'src/app/service/security/authority.service';
 import { RoleService } from 'src/app/service/security/role.service';
 import { FieldUtils } from 'src/app/util/field-utils';
+import { SelectRoleComponent } from './select-role.component';
 
 @Component({
     selector: 'app-role',
@@ -27,32 +29,33 @@ export class RoleComponent extends TreeEntityComponent<RoleService> {
 
     @ViewChild('editManyToManyComponent', { static: true }) editManyToManyComponent: EditManyToManyComponent;
 
-    grantToolbar: Array<Button> = [
-        {
-            name: '保存', type: 'primary', size: 'default',
-            authority: this.getAuthority('grantAuthorities'),
-            action: () => {
-                const role = this.editForm;
-                const authorities = this.editManyToManyComponent.items
-                    .filter(item => item.direction === 'right')
-                    .map(item => item.value);
-                this.entity.grantAuthorities(role, authorities, {
-                    before: () => this.editManyToManyComponent.loading = true,
-                    success: () => {
-                        this.message.info('保存成功');
-                        this.editManyToManyComponent.hide();
-                    },
-                    after: () => this.editManyToManyComponent.loading = false
-                });
-            }
+    drawerRef: NzDrawerRef;
+
+    grantToolbar: Array<Button> = [{
+        name: '保存', type: 'primary', size: 'default',
+        authority: this.getAuthority('grantAuthorities'),
+        action: () => {
+            const role = this.editForm;
+            const authorities = this.editManyToManyComponent.items
+                .filter(item => item.direction === 'right')
+                .map(item => item.value);
+            this.entity.grantAuthorities(role, authorities, {
+                before: () => this.editManyToManyComponent.loading = true,
+                success: () => {
+                    this.message.info('保存成功');
+                    this.editManyToManyComponent.hide();
+                },
+                after: () => this.editManyToManyComponent.loading = false
+            });
         }
-    ];
+    }];
 
     constructor(
-        private authority: AuthorityService,
+        public authority: AuthorityService,
         public entity: RoleService,
         public modal: NzModalService,
-        public message: NzMessageService
+        public message: NzMessageService,
+        public drawer: NzDrawerService
     ) {
         super(entity, modal, message);
     }
@@ -75,6 +78,12 @@ export class RoleComponent extends TreeEntityComponent<RoleService> {
             width: 58,
             authority: this.getAuthority('findAllRoleAuthoritiesByRole'),
             action: (row: any) => this.editGrantedAuthorities(row)
+        }, {
+            name: '复制权限',
+            type: 'link',
+            width: 58,
+            authority: this.getAuthority('findPage'),
+            action: (row: any) => this.showSelectRoleComponent(row)
         });
     }
 
@@ -92,6 +101,29 @@ export class RoleComponent extends TreeEntityComponent<RoleService> {
                 });
             },
             after: () => this.editManyToManyComponent.loading = false
+        });
+    }
+
+    showSelectRoleComponent(row: any): void {
+        this.drawerRef = this.drawer.create({
+            nzBodyStyle: { padding: '16px' },
+            nzWidth: '40%',
+            nzTitle: '复制权限',
+            nzContent: SelectRoleComponent,
+            nzContentParams: { role: row, roleComponent: this }
+        });
+    }
+
+    hideSelectRoleComponent(): void {
+        this.drawerRef.close();
+    }
+
+    copyAuthorities(source: any, target: any): void {
+        this.entity.copyAuthorities(source, target, {
+            success: () => {
+                this.message.info('复制成功');
+                this.hideSelectRoleComponent();
+            }
         });
     }
 

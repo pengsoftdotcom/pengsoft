@@ -38,6 +38,8 @@ export abstract class InputComponent extends BaseComponent implements OnInit {
         }
     }
 
-    modelChange(event: any): void { }
+    modelChange(event: any): void {
+        // 默认空实现
+    }
 
 }

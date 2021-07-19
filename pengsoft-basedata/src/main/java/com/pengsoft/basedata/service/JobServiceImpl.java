@@ -6,11 +6,14 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import com.pengsoft.basedata.domain.Department;
 import com.pengsoft.basedata.domain.Job;
 import com.pengsoft.basedata.domain.JobRole;
-import com.pengsoft.basedata.facade.OrganizationFacadeImpl;
+import com.pengsoft.basedata.domain.Organization;
+import com.pengsoft.basedata.domain.Staff;
 import com.pengsoft.basedata.repository.JobRepository;
 import com.pengsoft.basedata.repository.JobRoleRepository;
+import com.pengsoft.basedata.repository.StaffRepository;
 import com.pengsoft.security.domain.Role;
 import com.pengsoft.security.util.SecurityUtils;
 import com.pengsoft.support.service.TreeEntityServiceImpl;
@@ -32,22 +35,32 @@ public class JobServiceImpl extends TreeEntityServiceImpl<JobRepository, Job, St
     @Inject
     private JobRoleRepository jobRoleRepository;
 
+    @Inject
+    private StaffRepository staffRepository;
+
     @Override
     public Job save(final Job job) {
-        final var departmentId = job.getDepartment().getId();
-        final var parentId = Optional.ofNullable(job.getParent()).map(Job::getId).orElse(null);
-        getRepository().findOneByDepartmentIdAndParentIdAndName(departmentId, parentId, job.getName())
-                .ifPresent(source -> {
-                    if (EntityUtils.ne(source, job)) {
-                        throw getExceptions().constraintViolated("name", "exists", job.getName());
-                    }
-                });
-        if (!SecurityUtils.hasAnyRole(OrganizationFacadeImpl.ORGANIZATION_ADMIN)
-                && SecurityUtils.hasAnyRole(Role.ADMIN, OrganizationFacadeImpl.BASEDATA_ORGANIZATION_ADMIN)) {
-            job.setCreatedBy(job.getDepartment().getOrganization().getCreatedBy());
-            job.setBelongsTo(job.getDepartment().getOrganization().getId());
+        final var department = job.getDepartment();
+        final var parent = Optional.ofNullable(job.getParent()).orElse(null);
+        getRepository().findOneByDepartmentAndParentAndName(department, parent, job.getName()).ifPresent(source -> {
+            if (EntityUtils.ne(source, job)) {
+                throw getExceptions().constraintViolated("name", "exists", job.getName());
+            }
+        });
+        super.save(job);
+        getRepository().flush();
+        final var admin = job.getDepartment().getOrganization().getAdmin();
+        if (admin != null) {
+            final var createdBy = admin.getUser().getId();
+            final var updatedBy = SecurityUtils.getUserId();
+            final var staff = staffRepository.findOneByPersonAndPrimaryTrue(admin).orElse(null);
+            final var controlledBy = Optional.ofNullable(staff).map(Staff::getJob).map(Job::getDepartment)
+                    .map(Department::getId).orElse(null);
+            final var belongsTo = Optional.ofNullable(staff).map(Staff::getJob).map(Job::getDepartment)
+                    .map(Department::getOrganization).map(Organization::getId).orElse(null);
+            getRepository().updateBelonging(List.of(job), createdBy, updatedBy, controlledBy, belongsTo);
         }
-        return super.save(job);
+        return job;
     }
 
     @Override

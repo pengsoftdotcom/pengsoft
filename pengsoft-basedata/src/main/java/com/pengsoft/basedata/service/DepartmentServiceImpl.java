@@ -1,11 +1,16 @@
 package com.pengsoft.basedata.service;
 
+import java.util.List;
 import java.util.Optional;
 
+import javax.inject.Inject;
+
 import com.pengsoft.basedata.domain.Department;
-import com.pengsoft.basedata.facade.OrganizationFacadeImpl;
+import com.pengsoft.basedata.domain.Job;
+import com.pengsoft.basedata.domain.Organization;
+import com.pengsoft.basedata.domain.Staff;
 import com.pengsoft.basedata.repository.DepartmentRepository;
-import com.pengsoft.security.domain.Role;
+import com.pengsoft.basedata.repository.StaffRepository;
 import com.pengsoft.security.util.SecurityUtils;
 import com.pengsoft.support.service.TreeEntityServiceImpl;
 import com.pengsoft.support.util.EntityUtils;
@@ -25,11 +30,14 @@ import org.springframework.stereotype.Service;
 public class DepartmentServiceImpl extends TreeEntityServiceImpl<DepartmentRepository, Department, String>
         implements DepartmentService {
 
+    @Inject
+    private StaffRepository staffRepository;
+
     @Override
     public Department save(final Department department) {
-        final var organizationId = department.getOrganization().getId();
-        final var parentId = Optional.ofNullable(department.getParent()).map(Department::getId).orElse(null);
-        getRepository().findOneByOrganizationIdAndParentIdAndName(organizationId, parentId, department.getName())
+        final var organization = department.getOrganization();
+        final var parent = Optional.ofNullable(department.getParent()).orElse(null);
+        getRepository().findOneByOrganizationAndParentAndName(organization, parent, department.getName())
                 .ifPresent(source -> {
                     if (EntityUtils.ne(source, department)) {
                         throw getExceptions().constraintViolated("name", "exists", department.getName());
@@ -38,12 +46,20 @@ public class DepartmentServiceImpl extends TreeEntityServiceImpl<DepartmentRepos
         if (StringUtils.isBlank(department.getShortName())) {
             department.setShortName(department.getName());
         }
-        if (!SecurityUtils.hasAnyRole(OrganizationFacadeImpl.ORGANIZATION_ADMIN)
-                && SecurityUtils.hasAnyRole(Role.ADMIN, OrganizationFacadeImpl.BASEDATA_ORGANIZATION_ADMIN)) {
-            department.setCreatedBy(department.getOrganization().getCreatedBy());
-            department.setBelongsTo(department.getOrganization().getId());
+        super.save(department);
+        getRepository().flush();
+        final var admin = department.getOrganization().getAdmin();
+        if (admin != null) {
+            final var createdBy = admin.getUser().getId();
+            final var updatedBy = SecurityUtils.getUserId();
+            final var staff = staffRepository.findOneByPersonAndPrimaryTrue(admin).orElse(null);
+            final var controlledBy = Optional.ofNullable(staff).map(Staff::getJob).map(Job::getDepartment)
+                    .map(Department::getId).orElse(null);
+            final var belongsTo = Optional.ofNullable(staff).map(Staff::getJob).map(Job::getDepartment)
+                    .map(Department::getOrganization).map(Organization::getId).orElse(null);
+            getRepository().updateBelonging(List.of(department), createdBy, updatedBy, controlledBy, belongsTo);
         }
-        return super.save(department);
+        return department;
     }
 
 }

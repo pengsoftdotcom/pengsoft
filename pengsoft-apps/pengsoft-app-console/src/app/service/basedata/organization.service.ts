@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
-import { EntityService } from '../support/entity.service';
 import { HttpOptions } from '../support/http-options';
 import { HttpService } from '../support/http.service';
+import { TreeEntityService } from '../support/tree-entity.service';
 
 @Injectable({
     providedIn: 'root'
 })
-export class OrganizationService extends EntityService {
+export class OrganizationService extends TreeEntityService {
 
     constructor(protected http: HttpService) { super(http); }
 
@@ -16,6 +16,15 @@ export class OrganizationService extends EntityService {
 
     get entityPath(): string {
         return 'organization';
+    }
+
+    setAdmin(organization: any, admin: any, options: HttpOptions): void {
+        const url = this.getApiPath('set-admin');
+        options.params = { 'id': organization.id };
+        if (admin) {
+            options.body = admin;
+        }
+        this.http.request('POST', url, options);
     }
 
     findPageOfAvailableConsumers(supplier: any, options: HttpOptions): void {

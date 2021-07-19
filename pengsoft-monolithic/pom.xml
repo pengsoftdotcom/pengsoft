@@ -14,7 +14,6 @@
             <artifactId>pengsoft-basedata</artifactId>
         </dependency>
     </dependencies>
-
     <build>
         <plugins>
             <plugin>

@@ -4,10 +4,10 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { EditOneToManyComponent } from 'src/app/component/support/edit-one-to-many/edit-one-to-many.component';
 import { EditComponent } from 'src/app/component/support/edit/edit.component';
-import { EntityComponent } from 'src/app/component/support/entity.component';
 import { Option } from 'src/app/component/support/form-item/option';
 import { InputComponent } from 'src/app/component/support/input/input.component';
 import { ListComponent } from 'src/app/component/support/list/list.component';
+import { TreeEntityComponent } from 'src/app/component/support/tree-entity.component';
 import { DictionaryItemService } from 'src/app/service/basedata/dictionary-item.service';
 import { OrganizationService } from 'src/app/service/basedata/organization.service';
 import { PersonService } from 'src/app/service/basedata/person.service';
@@ -23,7 +23,7 @@ import { SelectAdminComponent } from './select-admin.component';
     templateUrl: './organization.component.html',
     styleUrls: ['./organization.component.scss']
 })
-export class OrganizationComponent extends EntityComponent<OrganizationService> implements OnInit {
+export class OrganizationComponent extends TreeEntityComponent<OrganizationService> implements OnInit {
 
     @ViewChild('listComponent', { static: true }) listComponent: ListComponent;
 
@@ -73,7 +73,26 @@ export class OrganizationComponent extends EntityComponent<OrganizationService> 
             }
         });
         this.fields = [
-            FieldUtils.buildTextForCode({ width: 300 }),
+            FieldUtils.buildSelect({
+                code: 'parent', name: '上级',
+                list: { visible: false },
+                edit: {
+                    input: {
+                        load: (component: InputComponent, event?: string) => {
+                            const params: any = {};
+                            if (event) {
+                                params.name = event;
+                            }
+                            this.entity.findAll(params, {
+                                before: () => this.loading = true,
+                                success: (res: any) => component.edit.input.options = res.map(entity => Object.assign({ label: entity.name, value: entity })),
+                                after: () => this.loading = false
+                            });
+                        }
+                    }
+                }
+            }),
+            FieldUtils.buildTextForCode(),
             FieldUtils.buildTextForName(),
             FieldUtils.buildText({ code: 'shortName', name: '简称' }),
             FieldUtils.buildCascader({
@@ -114,7 +133,7 @@ export class OrganizationComponent extends EntityComponent<OrganizationService> 
     initListAction(): void {
         super.initListAction();
         this.listAction.splice(0, 0, {
-            name: '设置管理员', type: 'link', width: 72, authority: 'basedata::organization::find_one',
+            name: '管理员', type: 'link', width: 44, authority: 'basedata::organization::set_admin',
             action: (row: any) => this.editAdmin(row)
         }, {
             name: '部门', type: 'link', width: 30, authority: 'basedata::department::find_all',
@@ -127,15 +146,28 @@ export class OrganizationComponent extends EntityComponent<OrganizationService> 
 
     initEditAdminAction(): void {
         this.editAdminToolbar = [
-            { name: '保存', type: 'primary', size: 'default', action: () => this.saveAdmin(), authority: this.getAuthority('save') },
-            { name: '选择', type: 'default', size: 'default', action: (row: any) => this.showSelectAdmin(), authority: 'basedata::person::find_page' },
-            { name: '删除', type: 'primary', size: 'default', danger: true, action: () => this.deleteAdmin(), authority: this.getAuthority('save') }
+            { name: '保存', type: 'primary', size: 'default', action: () => this.saveAdmin(), authority: this.getAuthority('setAdmin') },
+            { name: '选择', type: 'default', size: 'default', action: () => this.showSelectAdmin(), authority: 'basedata::person::find_page' },
+            { name: '删除', type: 'primary', size: 'default', danger: true, action: () => this.deleteAdmin(), authority: this.getAuthority('setAdmin') }
         ];
+    }
+
+    list(): void {
+        this.entity.findPage(this.filterForm, this.pageData, {
+            before: () => this.getListComponent().loading = true,
+            success: (res: any) => {
+                this.getListComponent().allChecked = false;
+                this.getListComponent().indeterminate = false;
+                this.listData = res.content;
+                this.pageData.total = res.totalElements;
+            },
+            after: () => this.getListComponent().loading = false
+        });
     }
 
     saveAdmin(): void {
         const form = this.buildForm();
-        this.entity.save(form, {
+        this.entity.setAdmin(form, form.admin, {
             errors: this.errors,
             before: () => this.editAdminComponent.loading = true,
             success: (res: any) => {
@@ -168,7 +200,7 @@ export class OrganizationComponent extends EntityComponent<OrganizationService> 
     deleteAdmin(): void {
         const form = this.buildForm();
         form.admin = null;
-        this.entity.save(form, {
+        this.entity.setAdmin(form, null, {
             errors: this.errors,
             before: () => this.editAdminComponent.loading = true,
             success: (res: any) => {

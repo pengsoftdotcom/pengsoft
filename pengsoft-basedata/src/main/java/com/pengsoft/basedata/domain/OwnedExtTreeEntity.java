@@ -33,10 +33,10 @@ public class OwnedExtTreeEntity<T extends OwnedTreeEntity<T>> extends OwnedTreeE
     public void preCreate() {
         super.preCreate();
         if (StringUtils.isBlank(getControlledBy())) {
-            setControlledBy(SecurityUtilsExt.getDepartmentId());
+            setControlledBy(SecurityUtilsExt.getPrimaryDepartmentId());
         }
         if (StringUtils.isBlank(getBelongsTo())) {
-            setBelongsTo(SecurityUtilsExt.getOrganizationId());
+            setBelongsTo(SecurityUtilsExt.getPrimaryOrganizationId());
         }
     }
 

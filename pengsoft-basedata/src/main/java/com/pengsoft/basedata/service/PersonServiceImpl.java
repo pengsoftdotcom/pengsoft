@@ -32,7 +32,7 @@ public class PersonServiceImpl extends EntityServiceImpl<PersonRepository, Perso
         if (StringUtils.isBlank(person.getNickname())) {
             person.setNickname("*" + person.getName().substring(1));
         }
-        return super.save(person);
+        return getRepository().saveAndFlush(person);
     }
 
     @Override

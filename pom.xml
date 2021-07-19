@@ -17,6 +17,7 @@
         <module>pengsoft-security</module>
         <module>pengsoft-system</module>
         <module>pengsoft-basedata</module>
+        <module>pengsoft-actuator</module>
         <module>pengsoft-monolithic</module>
     </modules>
 
@@ -31,7 +32,7 @@
         <javax.el.version>3.0.0</javax.el.version>
         <javax.inject.version>1</javax.inject.version>
         <querydsl.version>4.4.0</querydsl.version>
-        <redisson.version>3.15.5</redisson.version>
+        <redisson.version>3.16.0</redisson.version>
         <commons-collections4.version>4.4</commons-collections4.version>
         <pinyin4j.version>2.5.1</pinyin4j.version>
         <spring-security-oauth2.version>2.3.8.RELEASE</spring-security-oauth2.version>

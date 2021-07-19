@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Authorized
 @RestController
 @RequestMapping("api/user-details")
-public class UserDetailsApi {
+public class DefaultUserDetailsApi {
 
     @Inject
     private Exceptions exceptions;
@@ -64,7 +64,7 @@ public class UserDetailsApi {
     @AuthorityChanged
     @PostMapping("sign-out")
     public void signOut(@CurrentSecurityContext(expression = "authentication.principal.user") User user) {
-
+        // HandleAuthorityChangedAspect will do the rest.
     }
 
 }

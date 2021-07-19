@@ -66,10 +66,10 @@ export class JobComponent extends TreeEntityComponent<JobService> implements OnI
     ) {
         super(entity, modal, message);
         this.allowLoadNavData = true;
-        this.organization = this.security.userDetails.organization;
+        this.organization = this.security.userDetails.primaryOrganization;
     }
 
-    get params(): any {
+    get parentQueryParams(): any {
         if (this.department) {
             return { 'department.organization.id': this.department.organization.id };
         }
@@ -94,6 +94,7 @@ export class JobComponent extends TreeEntityComponent<JobService> implements OnI
                 }
             }),
             FieldUtils.buildTextForName(),
+            FieldUtils.buildNumber({ code: 'quantity', name: '人数' }),
             FieldUtils.buildBooleanForLocked({ code: 'departmentChief', name: '部门主管' }),
             FieldUtils.buildBooleanForLocked({ code: 'organizationChief', name: '机构主管' })
         );
@@ -102,7 +103,7 @@ export class JobComponent extends TreeEntityComponent<JobService> implements OnI
     initListToolbar(): void {
         super.initListToolbar();
         this.listToolbar.find(button => button.name === '新增').disabled = () => !this.department;
-        if (!this.security.userDetails.organization) {
+        if (!this.security.userDetails.primaryOrganization) {
             this.listToolbar.splice(2, 0, {
                 name: '切换机构',
                 type: 'link',

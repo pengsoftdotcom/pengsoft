@@ -13,13 +13,13 @@ import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
 @ActiveProfiles({ "support", "security", "system", "basedata" })
-public class SupplierConsumerFacadeTest {
+class SupplierConsumerFacadeTest {
 
     @Inject
-    private SupplierConsumerFacade facade;
+    SupplierConsumerFacade facade;
 
     @Inject
-    private OrganizationService service;
+    OrganizationService service;
 
     @Test
     void save() {

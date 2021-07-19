@@ -10,8 +10,10 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.pengsoft.security.domain.OwnedEntity;
 import com.pengsoft.security.domain.User;
+import com.pengsoft.security.json.MobileJsonSerializer;
 import com.pengsoft.support.validation.Chinese;
 import com.pengsoft.support.validation.Mobile;
 import com.pengsoft.system.domain.Asset;
@@ -57,6 +59,7 @@ public class Person extends OwnedEntity {
     @NotFound(action = NotFoundAction.IGNORE)
     private Asset avatar;
 
+    @JsonSerialize(using = MobileJsonSerializer.class)
     @NotBlank
     @Mobile
     @Column(updatable = false)

@@ -25,8 +25,6 @@ import org.springframework.security.core.userdetails.UserDetails;
  */
 public class SecurityUtils {
 
-    private static final String ADMIN = "admin";
-
     private static final SpelExpressionParser parser = new SpelExpressionParser();
 
     private SecurityUtils() {
@@ -73,20 +71,6 @@ public class SecurityUtils {
      */
     public static String getUserId() {
         return getId("user");
-    }
-
-    /**
-     * Returns the current role.
-     */
-    public static Role getCurrentRole() {
-        return get("currentRole", Role.class);
-    }
-
-    /**
-     * Returns the current role id.
-     */
-    public static String getCurrentRoleId() {
-        return getId("currentRole");
     }
 
     /**
@@ -152,10 +136,10 @@ public class SecurityUtils {
      * @param entityClass The entity class.
      * @return The module admin role code.
      */
-    public static String getModuleAdminCode(final Class<? extends Entity<? extends Serializable>> entityClass) {
+    public static String getModuleAdminRoleCode(final Class<? extends Entity<? extends Serializable>> entityClass) {
         final var moduleCode = getModuleCodeFromEntityClass(entityClass).replaceAll(ESCAPES + PACKAGE_SEPARATOR,
                 StringUtils.UNDERLINE);
-        return StringUtils.join(new String[] { moduleCode, ADMIN }, StringUtils.UNDERLINE);
+        return StringUtils.join(new String[] { moduleCode, Role.ADMIN }, StringUtils.UNDERLINE);
     }
 
     /**
@@ -164,10 +148,10 @@ public class SecurityUtils {
      * @param entityClass The entity class.
      * @return The entity admin role code
      */
-    public static String getEntityAdminCode(final Class<? extends Entity<? extends Serializable>> entityClass) {
+    public static String getEntityAdminRoleCode(final Class<? extends Entity<? extends Serializable>> entityClass) {
         final var moduleCode = getModuleCodeFromEntityClass(entityClass);
         final var entityCode = getEntityCodeFromEntityClass(entityClass);
-        return StringUtils.join(new String[] { moduleCode, entityCode, ADMIN }, StringUtils.UNDERLINE);
+        return StringUtils.join(new String[] { moduleCode, entityCode, Role.ADMIN }, StringUtils.UNDERLINE);
     }
 
     /**

@@ -51,17 +51,9 @@ export class SelectSupplierComponent extends OrganizationComponent {
         this.entity.findAllAvailableSuppliers(this.editForm.consumer, {
             before: () => this.getListComponent().loading = true,
             success: (res: any) => {
-                const tree = EntityUtils.convertListToTree(res);
-                const list = EntityUtils.convertTreeToList(tree, node => {
-                    const value = node.value;
-                    value.expand = true;
-                    value.loaded = true;
-                    value.children = node.children;
-                    const parentIds = value.parentIds ? value.parentIds + '::' + value.id : value.id;
-                    value.leaf = !res.some(data => data.parentIds.startsWith(parentIds));
-                    return value;
-                });
-                this.listData = list;
+                this.getListComponent().allChecked = false;
+                this.getListComponent().indeterminate = false;
+                this.listData = res;
             },
             after: () => this.getListComponent().loading = false
         });

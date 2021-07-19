@@ -40,7 +40,7 @@ public class HandleApiOperationAuthorityAspect {
         var method = ((MethodSignature) jp.getSignature()).getMethod();
         method = ClassUtils.getPublicMethod(apiClass, jp.getSignature().getName(), method.getParameterTypes());
         final var args = jp.getArgs();
-        if (apiClass.getAnnotation(Authorized.class) == null && method.getAnnotation(Authorized.class) == null
+        if (apiClass.isAnnotationPresent(Authorized.class) && method.isAnnotationPresent(Authorized.class)
                 && SecurityUtils.getUserDetails() != null) {
             final var modulePart = SecurityUtils.getModuleCodeFromEntityClass(entityClass);
             final var entityPart = SecurityUtils.getEntityCodeFromEntityClass(entityClass);

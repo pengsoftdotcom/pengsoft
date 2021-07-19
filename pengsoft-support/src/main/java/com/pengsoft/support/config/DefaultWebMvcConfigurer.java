@@ -10,6 +10,8 @@ import com.pengsoft.support.config.properties.WebMvcConfigurationProperties;
 import com.pengsoft.support.json.ObjectMapper;
 import com.pengsoft.support.util.DateUtils;
 
+import org.springframework.boot.actuate.trace.http.HttpTraceRepository;
+import org.springframework.boot.actuate.trace.http.InMemoryHttpTraceRepository;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.MessageSource;
@@ -100,6 +102,11 @@ public class DefaultWebMvcConfigurer implements WebMvcConfigurer {
         registrationBean.setFilter(new CorsFilter(source));
         registrationBean.setOrder(Ordered.HIGHEST_PRECEDENCE);
         return registrationBean;
+    }
+
+    @Bean
+    public HttpTraceRepository httpTraceRepository() {
+        return new InMemoryHttpTraceRepository();
     }
 
 }
